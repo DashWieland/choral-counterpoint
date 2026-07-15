@@ -91,6 +91,19 @@ the signal lives; inner voices are filler constrained by the frame.
   attention's reliable ceiling (measured: five-of-six, every time). Run it;
   never hand-verify only.
 
+## Ornamentation (after the skeleton passes)
+
+A clean skeleton can be figured the way Bach figures his:
+`python scripts/ornament.py skeleton.json out.json [--density 1.0] [--seed 7]`
+applies eighth-note passing tones, neighbors, suspensions, and cadential
+anticipations at rates mined from the corpus (bass fills 84% of rising
+thirds; alto suspends at 13% of step-down opportunities; soprano stays
+plain 91% of the time). Every candidate ornament is auto-rejected if it
+would break a rule or create a new surface parallel. Verify any ornamented
+score with `python scripts/check_ornaments.py piece.json` — event-format
+scores carry their skeleton, and the checker enforces NCT discipline
+(suspensions prepared and resolved down, passing tones stepwise).
+
 ## Files
 
 - `scripts/check_species1.py` — two-voice rule checker (JSON or 2-track MIDI)
@@ -98,9 +111,12 @@ the signal lives; inner voices are filler constrained by the frame.
   corpus (false-alarm floor 0.24/chorale, every residual category explained)
 - `scripts/oracle_outer.py` — outer-voice oracle, 16,852 transitions from 345
   chorales; propose mode and `--bass` veto mode
+- `scripts/ornament.py` / `scripts/check_ornaments.py` — corpus-rate
+  figuration over a verified skeleton, and its surface checker
 - `scripts/render_midi.py` — JSON → MIDI at any BPM; fermatas held 2×
-- `data/outer_voice_table.json` — the mined table (rebuild:
-  `tools/mine_oracle.py` in the auto_compose repo)
+- `scripts/score_io.py` — shared loading for slot- and event-format scores
+- `data/outer_voice_table.json`, `data/ornament_table.json` — mined tables
+  (rebuild: `tools/mine_oracle.py`, `tools/mine_ornaments.py` in the repo)
 
 ## Known limits
 

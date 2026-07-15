@@ -19,12 +19,30 @@ These styles are unusual in one crucial way: they are among the only creative do
 └── data/
     └── outer_voice_table.json    # 16,852 outer-voice transitions from 345 chorales
 
+engine/                           # fully automatic composition (no LLM in the loop)
+├── compose.py                    # melody planner → oracle-governed bass beam search
+│                                 #   → inner-voice search → verify → ornament (~30 ms/piece)
+└── serve.py                      # HTTP server: /compose, /compose.mid, /next
+                                  #   (compose-ahead buffer for instruments)
+
 tools/                            # rebuild / validation harnesses (need music21)
 ├── mine_oracle.py                # regenerates the oracle table from the corpus
-└── validate_checker.py           # runs the checker over Bach himself (false-alarm test)
+├── mine_ornaments.py             # regenerates Bach's figuration rates
+├── validate_checker.py           # runs the checker over Bach himself (false-alarm test)
+└── perform.py                    # choir-ish synthesizer: score JSON → WAV
 
-out/                              # example compositions (JSON + MIDI)
+out/                              # example compositions (JSON + MIDI + WAV)
 ```
+
+The skill also ships an **ornamentation layer**: `ornament.py` decorates a
+verified skeleton with passing tones, neighbors, suspensions, and cadential
+anticipations at rates mined from Bach's own figuration habits, rejecting any
+candidate that would break a rule, and `check_ornaments.py` verifies the
+result. The **engine** composes without a model in the loop — the oracle
+proposes bass moves (zero-support moves excluded), beam searches take the
+composer's veto role with line-shape scoring, and the checkers remain the
+final gate. Batch-validated: 24/24 configurations across six keys, both
+modes, clean.
 
 ## The three safeguards
 
