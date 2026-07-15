@@ -1,0 +1,107 @@
+{
+ "fills": {
+  "soprano": {
+   "third_down_plain": 597,
+   "third_up_plain": 372,
+   "third_up_filled": 411,
+   "third_down_filled": 362
+  },
+  "alto": {
+   "third_down_plain": 637,
+   "third_up_filled": 706,
+   "third_down_filled": 603,
+   "third_up_plain": 357
+  },
+  "tenor": {
+   "third_down_filled": 820,
+   "third_up_plain": 378,
+   "third_up_filled": 735,
+   "third_down_plain": 566
+  },
+  "bass": {
+   "third_down_plain": 512,
+   "third_down_filled": 1327,
+   "third_up_plain": 198,
+   "third_up_filled": 1056
+  }
+ },
+ "neighbors": {
+  "soprano": {
+   "plain": 2949,
+   "neighbor": 69
+  },
+  "alto": {
+   "plain": 3706,
+   "neighbor": 344
+  },
+  "tenor": {
+   "plain": 3237,
+   "neighbor": 220
+  },
+  "bass": {
+   "plain": 1298,
+   "neighbor": 387
+  }
+ },
+ "anticipations": {
+  "soprano": {
+   "plain": 1436,
+   "ant": 35
+  },
+  "alto": {},
+  "tenor": {},
+  "bass": {}
+ },
+ "suspensions": {
+  "soprano": {
+   "sus": 125,
+   "opportunity": 4074
+  },
+  "alto": {
+   "sus": 376,
+   "opportunity": 2936
+  },
+  "tenor": {
+   "opportunity": 2591,
+   "sus": 224
+  },
+  "bass": {
+   "sus": 102,
+   "opportunity": 1520
+  }
+ },
+ "shapes": {
+  "soprano": {
+   "plain": 12787,
+   "neighbor": 80,
+   "fill": 773,
+   "other": 165,
+   "anticipation": 112
+  },
+  "alto": {
+   "plain": 11248,
+   "neighbor": 402,
+   "fill": 1318,
+   "anticipation": 161,
+   "other": 788
+  },
+  "tenor": {
+   "plain": 10847,
+   "fill": 1560,
+   "neighbor": 267,
+   "other": 1095,
+   "anticipation": 148
+  },
+  "bass": {
+   "plain": 10234,
+   "fill": 2420,
+   "other": 846,
+   "neighbor": 402,
+   "anticipation": 15
+  }
+ },
+ "meta": {
+  "chorales": 274,
+  "skipped": 97
+ }
+}
