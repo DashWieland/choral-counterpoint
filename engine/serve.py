@@ -97,6 +97,30 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def do_POST(self):
+        """POST /harmonize with a melody JSON body:
+        {"tonic":"F","mode":"major","soprano":[...],"fermatas":[...],
+         "seed":7,"density":1.0,"plain":false}  -> event-format JSON"""
+        url = urlparse(self.path)
+        try:
+            body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+            if url.path != '/harmonize':
+                self.send(404, b'{"error": "unknown endpoint"}', 'application/json')
+                return
+            piece = engine.compose(
+                tonic=body.get('tonic', 'D'), mode=body.get('mode', 'minor'),
+                seed=int(body.get('seed', 7)), density=float(body.get('density', 1.0)),
+                plain=bool(body.get('plain', False)),
+                given_melody={'soprano': body['soprano'],
+                              'fermatas': body.get('fermatas', [])})
+            if piece is None:
+                self.send(422, b'{"error": "could not harmonize this melody cleanly"}',
+                          'application/json')
+            else:
+                self.send(200, json.dumps(piece).encode(), 'application/json')
+        except Exception as e:
+            self.send(500, json.dumps({'error': str(e)}).encode(), 'application/json')
+
     def do_GET(self):
         url = urlparse(self.path)
         qs = parse_qs(url.query)

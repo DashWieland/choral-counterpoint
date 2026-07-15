@@ -50,7 +50,9 @@ def soprano_bass_seq(chorale):
         next_is_phrase_start = fermata
     return seq
 
-def main(limit=10**9):
+def main(limit=10**9, exclude=None, out=None):
+    """exclude: list of title substrings to leave out (for clean-room evals);
+    out: alternative output path."""
     transitions = defaultdict(Counter)
     arrivals = defaultdict(Counter)
     openings = defaultdict(Counter)
@@ -58,6 +60,10 @@ def main(limit=10**9):
     for i, chorale in enumerate(corpus.chorales.Iterator()):
         if i >= limit:
             break
+        title = (chorale.metadata.title or '')
+        if exclude and any(x.lower() in title.lower() for x in exclude):
+            n_skip += 1
+            continue
         try:
             seq = soprano_bass_seq(chorale)
             k = chorale.analyze('key')
@@ -80,15 +86,16 @@ def main(limit=10**9):
             transitions[f"{mode}|{rel(ps)}>{rel(s)}|{cad}"][f"{rel(pb)}>{rel(b)}"] += 1
             arrivals[f"{mode}|{rel(s)}|{cad}"][str(rel(b))] += 1
             n_trans += 1
-    OUT.parent.mkdir(parents=True, exist_ok=True)
+    dest = Path(out) if out else OUT
+    dest.parent.mkdir(parents=True, exist_ok=True)
     json.dump({
         'transitions': {k: dict(v) for k, v in transitions.items()},
         'arrivals': {k: dict(v) for k, v in arrivals.items()},
         'openings': {k: dict(v) for k, v in openings.items()},
         'meta': {'chorales': n_ok, 'skipped': n_skip, 'transitions': n_trans,
                  'granularity': 'soprano onsets', 'pc_encoding': 'semitones above tonic'},
-    }, open(OUT, 'w'), indent=1)
-    print(f"mined {n_ok} chorales ({n_skip} skipped), {n_trans} transitions -> {OUT}")
+    }, open(dest, 'w'), indent=1)
+    print(f"mined {n_ok} chorales ({n_skip} skipped), {n_trans} transitions -> {dest}")
 
 if __name__ == '__main__':
     main(int(sys.argv[1]) if len(sys.argv) > 1 else 10**9)
