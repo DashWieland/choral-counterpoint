@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+tools/validation_full.txt
+.claude/settings.local.json
