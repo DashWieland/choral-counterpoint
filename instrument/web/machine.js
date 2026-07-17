@@ -85,24 +85,26 @@ export function mountHurdyGurdy(container, opts = {}) {
           <button class="hg-motor" type="button">&#9656; MOTOR</button>
           <div class="hg-bpm">000 BPM</div>
         </div>
+        <div class="hg-crankunit">
+          <svg class="hg-crank" viewBox="0 0 120 132" aria-hidden="true">
+            <circle cx="60" cy="60" r="46" fill="none" class="hg-swing"/>
+            <circle cx="60" cy="60" r="14" class="hg-hatch"/>
+            <circle cx="60" cy="60" r="14" fill="none" class="hg-ink" stroke-width="1.4"/>
+            <circle cx="49.5" cy="60" r="1.5" class="hg-ink-fill"/>
+            <circle cx="70.5" cy="60" r="1.5" class="hg-ink-fill"/>
+            <circle cx="60" cy="49.5" r="1.5" class="hg-ink-fill"/>
+            <circle cx="60" cy="70.5" r="1.5" class="hg-ink-fill"/>
+            <g class="hg-crank-rot">
+              <line x1="60" y1="60" x2="60" y2="21" class="hg-ink" stroke-width="5"/>
+              <circle cx="60" cy="17" r="11" class="hg-grip"/>
+              <circle cx="60" cy="17" r="4" fill="none" class="hg-ink" stroke-width="1"/>
+            </g>
+            <circle cx="60" cy="60" r="5" class="hg-ink-fill"/>
+          </svg>
+          <div class="hg-hint">scroll to turn</div>
+        </div>
       </div>
       <a class="hg-export" href="#" download>SAVE THIS PIECE (.MID) &#8595;</a>
-    </div>
-    <div class="hg-crankunit">
-      <svg class="hg-crank" viewBox="0 0 160 160" aria-hidden="true">
-        <rect x="0" y="68" width="22" height="24" fill="none" class="hg-ink" stroke-width="1.4"/>
-        <line x1="14" y1="80" x2="80" y2="80" class="hg-ink" stroke-width="4"/>
-        <g class="hg-crank-rot">
-          <circle cx="80" cy="80" r="56" class="hg-hatch"/>
-          <circle cx="80" cy="80" r="56" fill="none" class="hg-ink" stroke-width="1.6"/>
-          <circle cx="80" cy="80" r="47" fill="none" class="hg-ink" stroke-width="0.7"/>
-          <circle cx="80" cy="80" r="5" class="hg-ink-fill"/>
-          <line x1="80" y1="80" x2="118" y2="26" class="hg-ink" stroke-width="5"/>
-          <circle cx="122" cy="20" r="13" class="hg-grip"/>
-          <circle cx="122" cy="20" r="5" fill="none" class="hg-ink" stroke-width="1"/>
-        </g>
-      </svg>
-      <div class="hg-hint">scroll to turn</div>
     </div>
   </div>`;
 
@@ -125,7 +127,7 @@ export function mountHurdyGurdy(container, opts = {}) {
   let bpmTarget = 0;
   let motorOn = false;
   let lastUserInput = -1e9;
-  let crankAngle = 0;
+  let crankAngle = 2.4;            // at rest the arm hangs low, as cranks do
   let choir = null, audioCtx = null;
   const sounding = new Map();    // eventKey -> handle
   let colors = null;
@@ -166,8 +168,8 @@ export function mountHurdyGurdy(container, opts = {}) {
     }
   }
 
-  function setPiece(p, n, startPos) {
-    for (const h of sounding.values()) choir && choir.noteOff(h);
+  function setPiece(p, n, startPos, elide = false) {
+    for (const h of sounding.values()) choir && choir.noteOff(h, elide ? 1.4 : 0.14);
     sounding.clear();
     piece = p; number = n; pos = startPos;
     reflatten();
@@ -207,15 +209,15 @@ export function mountHurdyGurdy(container, opts = {}) {
     if (audible) pos += (bpm / 60) * 2 * dt;
     crankAngle += (bpm / 60) * 2 * Math.PI * dt * 0.5;
     crankRot.style.transform = `rotate(${crankAngle}rad)`;
-    crankRot.style.transformOrigin = '80px 80px';
+    crankRot.style.transformOrigin = '60px 60px';
 
     // piece transitions (with a breath of silence either side)
-    if (pos > perfTotal + 2) {
+    if (pos >= perfTotal) {
       const nx = pieceOrNext(number + 1);
-      setPiece(nx.piece, nx.number, -2);
-    } else if (pos < -3 && bpm < 0) {
+      setPiece(nx.piece, nx.number, 0, true);     // last chord rings into the next piece
+    } else if (pos < 0 && bpm < -MIN_AUDIBLE_BPM) {
       const pv = pieceOrNext(Math.max(1, number - 1), -1);
-      setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) + 2);
+      setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) - 0.01, true);
     }
 
     // declarative sounding set: works forward, backward, and through seeks
