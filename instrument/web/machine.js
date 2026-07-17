@@ -15,6 +15,13 @@ const MAX_BPM = 140, MIN_AUDIBLE_BPM = 5;
 
 const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
+function perfTotalOf(p) {
+  const ferm = new Set(p.fermataEighths);
+  let t = 0;
+  for (let k = 0; k < p.totalEighths; k++) t += (ferm.has(k) || ferm.has(k - 1)) ? 2 : 1;
+  return t;
+}
+
 function pieceOrNext(n, dir = 1) {
   for (let k = n; ; k += dir) {
     if (k < 1) return { piece: composePiece(1) || null, number: 1 };
@@ -66,7 +73,7 @@ export function mountHurdyGurdy(container, opts = {}) {
 
   container.innerHTML = `
   <div class="hg" style="position:relative; user-select:none; touch-action:none;">
-    <div class="hg-title">FIG. 1 — CHORAL HURDY-GURDY</div>
+    <div class="hg-title">CHORAL HURDY-GURDY</div>
     <div class="hg-cabinet">
       <div class="hg-tapeframe"><canvas class="hg-tape"></canvas></div>
       <div class="hg-panel">
@@ -79,23 +86,29 @@ export function mountHurdyGurdy(container, opts = {}) {
           <div class="hg-bpm">000 BPM</div>
         </div>
       </div>
-      <a class="hg-export" href="#" download>EXPORT .MID &#8595;</a>
+      <a class="hg-export" href="#" download>SAVE THIS PIECE (.MID) &#8595;</a>
     </div>
-    <svg class="hg-crank" viewBox="0 0 92 92" aria-hidden="true">
-      <rect x="0" y="40" width="14" height="12" class="hg-ink-fill"/>
-      <line x1="10" y1="46" x2="46" y2="46" class="hg-ink" stroke-width="3"/>
-      <g class="hg-crank-rot">
-        <circle cx="46" cy="46" r="18" class="hg-hatch"/>
-        <circle cx="46" cy="46" r="18" fill="none" class="hg-ink" stroke-width="1.4"/>
-        <circle cx="46" cy="46" r="2.6" class="hg-ink-fill"/>
-        <line x1="46" y1="46" x2="60" y2="21" class="hg-ink" stroke-width="3"/>
-        <circle cx="63" cy="16" r="7" class="hg-grip"/>
-      </g>
-    </svg>
-    <div class="hg-hint">scroll to turn</div>
+    <div class="hg-crankunit">
+      <svg class="hg-crank" viewBox="0 0 160 160" aria-hidden="true">
+        <rect x="0" y="68" width="22" height="24" fill="none" class="hg-ink" stroke-width="1.4"/>
+        <line x1="14" y1="80" x2="80" y2="80" class="hg-ink" stroke-width="4"/>
+        <g class="hg-crank-rot">
+          <circle cx="80" cy="80" r="56" class="hg-hatch"/>
+          <circle cx="80" cy="80" r="56" fill="none" class="hg-ink" stroke-width="1.6"/>
+          <circle cx="80" cy="80" r="47" fill="none" class="hg-ink" stroke-width="0.7"/>
+          <circle cx="80" cy="80" r="5" class="hg-ink-fill"/>
+          <line x1="80" y1="80" x2="118" y2="26" class="hg-ink" stroke-width="5"/>
+          <circle cx="122" cy="20" r="13" class="hg-grip"/>
+          <circle cx="122" cy="20" r="5" fill="none" class="hg-ink" stroke-width="1"/>
+        </g>
+      </svg>
+      <div class="hg-hint">scroll to turn</div>
+    </div>
   </div>`;
 
   const root = container.querySelector('.hg');
+  if (matchMedia('(pointer: coarse)').matches)
+    root.querySelector('.hg-hint').textContent = 'drag to turn';
   const canvas = root.querySelector('.hg-tape');
   const plateNo = root.querySelector('.hg-plate-no');
   const plateInfo = root.querySelector('.hg-plate-info');
@@ -107,8 +120,9 @@ export function mountHurdyGurdy(container, opts = {}) {
 
   // ---- state ----
   let { piece, number } = pieceOrNext(initialNumber);
-  let pos = -2;                  // eighths; small lead-in
+  let pos = -2;                  // performance eighths; small lead-in
   let bpm = 0;                   // signed: negative = retrograde
+  let bpmTarget = 0;
   let motorOn = false;
   let lastUserInput = -1e9;
   let crankAngle = 0;
@@ -133,13 +147,20 @@ export function mountHurdyGurdy(container, opts = {}) {
     .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   let flat = [];
+  let perfAt = [];                 // source eighth -> performance eighth
+  let perfTotal = 0;
   function reflatten() {
+    const ferm = fermSet();
+    perfAt = [0];
+    for (let k = 0; k < piece.totalEighths; k++)
+      perfAt.push(perfAt[k] + ((ferm.has(k) || ferm.has(k - 1)) ? 2 : 1));
+    perfTotal = perfAt[piece.totalEighths];
     flat = [];
     for (const vn of ['s', 'a', 't', 'b']) {
       let t = 0;
-      const ferm = fermSet();
       for (const [m, ln] of piece.events[vn]) {
-        flat.push({ vn, m, start: t, end: t + ln, ferm: ferm.has(t), key: `${vn}:${t}` });
+        flat.push({ vn, m, start: perfAt[t], end: perfAt[t + ln],
+                    ferm: ferm.has(t), key: `${vn}:${t}` });
         t += ln;
       }
     }
@@ -151,8 +172,7 @@ export function mountHurdyGurdy(container, opts = {}) {
     piece = p; number = n; pos = startPos;
     reflatten();
     plateNo.textContent = `No. ${String(n).padStart(4, '0')}`;
-    plateInfo.textContent =
-      `${p.key.toUpperCase()} · ${p.phrases} PHRASES · ${p.violations} VIOLATIONS`;
+    plateInfo.textContent = `${p.key.toUpperCase()} · ${p.phrases} PHRASES`;
     const bytes = midiBytes(p);
     exportA.href = URL.createObjectURL(new Blob([bytes], { type: 'audio/midi' }));
     exportA.download = `chorale-${String(n).padStart(4, '0')}.mid`;
@@ -175,31 +195,27 @@ export function mountHurdyGurdy(container, opts = {}) {
   // ---- physics + transport ----
   function tick(dt) {
     const idle = performance.now() / 1000 - lastUserInput > 1.2;
-    if (motorOn && idle) bpm += (MOTOR_BPM - bpm) * Math.min(1, dt * 2.5);
-    else bpm *= Math.exp(-dt / 1.4);
-    bpm = Math.max(-MAX_BPM, Math.min(MAX_BPM, bpm));
+    if (motorOn && idle) bpmTarget += (MOTOR_BPM - bpmTarget) * Math.min(1, dt * 2.5);
+    else bpmTarget *= Math.exp(-dt / 1.4);
+    bpmTarget = Math.max(-MAX_BPM, Math.min(MAX_BPM, bpmTarget));
+    bpm += (bpmTarget - bpm) * Math.min(1, dt * 6);   // smooths wheel-tick pulses
     const audible = Math.abs(bpm) >= MIN_AUDIBLE_BPM;
     if (!audible && choir && sounding.size) {
       for (const h of sounding.values()) choir.noteOff(h, 0.5);
       sounding.clear();
     }
-    if (audible) {
-      const ferm = fermSet();
-      const here = Math.floor(pos);
-      const mult = (ferm.has(here) || ferm.has(here - 1)) ? 2 : 1;
-      pos += (bpm / 60) * 2 * dt / mult;
-    }
+    if (audible) pos += (bpm / 60) * 2 * dt;
     crankAngle += (bpm / 60) * 2 * Math.PI * dt * 0.5;
     crankRot.style.transform = `rotate(${crankAngle}rad)`;
-    crankRot.style.transformOrigin = '46px 46px';
+    crankRot.style.transformOrigin = '80px 80px';
 
     // piece transitions (with a breath of silence either side)
-    if (pos > piece.totalEighths + 2) {
+    if (pos > perfTotal + 2) {
       const nx = pieceOrNext(number + 1);
       setPiece(nx.piece, nx.number, -2);
     } else if (pos < -3 && bpm < 0) {
       const pv = pieceOrNext(Math.max(1, number - 1), -1);
-      setPiece(pv.piece, pv.number, pv.piece.totalEighths + 2);
+      setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) + 2);
     }
 
     // declarative sounding set: works forward, backward, and through seeks
@@ -262,7 +278,7 @@ export function mountHurdyGurdy(container, opts = {}) {
     g.setLineDash([]);
     // beat ruling + perforations
     for (let e = 0; e <= piece.totalEighths; e += 2) {
-      const x = originX + e * ew;
+      const x = originX + perfAt[e] * ew;
       if (x < -4 || x > W + 4) continue;
       g.strokeStyle = colors.border;
       g.globalAlpha = 0.55;
@@ -271,7 +287,7 @@ export function mountHurdyGurdy(container, opts = {}) {
       g.globalAlpha = 1;
     }
     for (const f of piece.fermataEighths) {
-      const x = originX + (f + 2) * ew;
+      const x = originX + perfAt[Math.min(f + 2, piece.totalEighths)] * ew;
       if (x < -4 || x > W + 4) continue;
       g.strokeStyle = colors.border;
       g.lineWidth = 1;
@@ -333,8 +349,7 @@ export function mountHurdyGurdy(container, opts = {}) {
   function impulse(delta) {
     ensureAudio();
     lastUserInput = performance.now() / 1000;
-    bpm += delta;
-    bpm = Math.max(-MAX_BPM, Math.min(MAX_BPM, bpm));
+    bpmTarget = Math.max(-MAX_BPM, Math.min(MAX_BPM, bpmTarget + delta));
   }
   root.addEventListener('wheel', e => {
     e.preventDefault();
@@ -358,11 +373,11 @@ export function mountHurdyGurdy(container, opts = {}) {
     motorOn = !motorOn;
     lastUserInput = -1e9;
     motorBtn.classList.toggle('hg-motor-on', motorOn);
-    if (motorOn && Math.abs(bpm) < MIN_AUDIBLE_BPM) bpm = MIN_AUDIBLE_BPM + 1;
+    if (motorOn && Math.abs(bpmTarget) < MIN_AUDIBLE_BPM) bpmTarget = MIN_AUDIBLE_BPM + 1;
   });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      bpm = 0;
+      bpm = 0; bpmTarget = 0;
       if (choir) { choir.releaseAll(0.2); sounding.clear(); }
     }
   });
