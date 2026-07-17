@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="electric">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choral Hurdy-Gurdy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-bg:             #0f0e0c;
+  --color-surface:        #1c1a16;
+  --color-border:         #3a3630;
+  --color-text-primary:   #e8e0d0;
+  --color-text-secondary: #938a78;
+  --color-accent-1:       #c4621d;
+  --color-accent-2:       #8b6fc0;
+  --color-accent-3:       #5a9068;
+  --color-signal:         #d4a017;
+  --color-accent-5:       #7a9bab;
+  --color-accent-6:       #b86278;
+  --color-danger:         #8b2e2e;
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'IBM Plex Mono', monospace;
+}
+[data-theme="candlelight"] {
+  --color-bg:             #f5edd8;
+  --color-surface:        #ede1c6;
+  --color-border:         #c8b89a;
+  --color-text-primary:   #1a120a;
+  --color-text-secondary: #6b5640;
+  --color-accent-1:       #9e3d0a;
+  --color-accent-2:       #6b4fa0;
+  --color-accent-3:       #3a7048;
+  --color-signal:         #a47c07;
+  --color-accent-5:       #5a7b8b;
+  --color-accent-6:       #985268;
+  --color-danger:         #8b2e2e;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 48px 12px;
+}
+.wrap { width: 100%; max-width: 760px; }
+.topbar {
+  display: flex; justify-content: flex-end; margin-bottom: 24px;
+}
+.topbar button {
+  background: transparent; border: 1px solid var(--color-accent-1);
+  color: var(--color-accent-1); font-family: var(--font-body);
+  font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 2px; cursor: pointer;
+}
+.caption {
+  margin-top: 24px; font-size: 0.85rem; line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+.caption em { color: var(--color-text-primary); font-style: italic; }
+
+</style>
+<link rel="stylesheet" href="hurdy-gurdy.css">
+
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><button onclick="
+    const h = document.documentElement;
+    h.dataset.theme = h.dataset.theme === 'electric' ? 'candlelight' : 'electric';
+  ">switch theme</button></div>
+  <div id="machine"></div>
+  <p class="caption">Every turn of the crank plays a chorale that has never
+  been heard — composed and verified <em>in your browser</em>.</p>
+</div>
+<script type="module">
+import { mountHurdyGurdy } from './machine.js';
+mountHurdyGurdy(document.getElementById('machine'));
+</script>
+</body>
+</html>

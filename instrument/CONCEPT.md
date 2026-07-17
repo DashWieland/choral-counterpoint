@@ -1,7 +1,8 @@
 # The Choral Hurdy-Gurdy — design concept
 
-*Concept phase deliverable. Nothing here is built yet; this is the vision we
-sign off on before writing the real thing.*
+*Signed off and built: the machine lives in `instrument/web/` (standalone
+page + framework-free modules); site handoff in `website_handoff/`. This
+document remains the design record.*
 
 ## The one-sentence idea
 

@@ -1,0 +1,89 @@
+/* ---------------- the machine ---------------- */
+.hg { padding-right: 54px; }
+.hg-title {
+  font-size: 0.9rem; letter-spacing: 0.14em; margin-bottom: 12px;
+  color: var(--color-text-primary);
+}
+.hg-cabinet {
+  border: 1.4px solid var(--color-text-primary);
+  background:
+    var(--color-bg)
+    padding-box;
+  position: relative;
+  padding: 18px;
+}
+/* patent-drawing depth: an offset cross-hatched slab */
+.hg-cabinet::after {
+  content: '';
+  position: absolute;
+  left: 10px; top: 10px; right: -10px; bottom: -10px;
+  border: 1px solid var(--color-border);
+  background-image: repeating-linear-gradient(45deg,
+    var(--color-border) 0, var(--color-border) 1px, transparent 1px, transparent 5px);
+  z-index: -1;
+}
+.hg-tapeframe {
+  border: 1px solid var(--color-border);
+  outline: 1px solid var(--color-border);
+  outline-offset: 5px;
+  height: 216px;
+  margin: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.hg-tape { display: block; width: 100%; height: 100%; cursor: grab; }
+.hg-panel {
+  display: flex; align-items: stretch; gap: 24px;
+  border-top: 1px solid var(--color-border);
+  margin-top: 18px; padding-top: 14px;
+}
+.hg-plate {
+  border: 1px solid var(--color-text-primary);
+  outline: 1px solid var(--color-border);
+  outline-offset: -5px;
+  padding: 12px 18px;
+  min-width: 300px;
+}
+.hg-plate-no { font-size: 0.85rem; letter-spacing: 0.12em; }
+.hg-plate-info {
+  font-size: 0.62rem; letter-spacing: 0.1em;
+  color: var(--color-text-secondary); margin-top: 6px;
+}
+.hg-controls { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.hg-motor {
+  background: var(--color-accent-1); color: var(--color-bg);
+  border: none; border-radius: 2px; cursor: pointer;
+  font-family: var(--font-body); font-size: 0.72rem;
+  letter-spacing: 0.1em; padding: 8px 18px;
+}
+.hg-motor-on { background: var(--color-signal); }
+.hg-bpm {
+  border: 1px solid var(--color-border); background: var(--color-surface);
+  color: var(--color-signal); font-size: 0.7rem; letter-spacing: 0.18em;
+  text-align: center; padding: 4px 0;
+}
+.hg-export {
+  display: inline-block; margin-top: 10px;
+  color: var(--color-accent-1); font-size: 0.62rem; letter-spacing: 0.08em;
+  text-decoration: none;
+}
+.hg-export:hover { text-decoration: underline; }
+.hg-crank {
+  position: absolute; right: -8px; bottom: 64px;
+  width: 92px; height: 92px;
+}
+.hg-ink { stroke: var(--color-text-primary); }
+.hg-ink-fill { fill: var(--color-text-primary); }
+.hg-grip { fill: var(--color-accent-1); stroke: var(--color-text-primary); stroke-width: 1.2; }
+.hg-hatch { fill: var(--color-border); opacity: 0.5; }
+.hg-hint {
+  position: absolute; right: -8px; bottom: 34px;
+  font-size: 0.6rem; letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+}
+@media (max-width: 560px) {
+  .hg { padding-right: 40px; }
+  .hg-plate { min-width: 0; flex: 1; }
+  .hg-panel { gap: 12px; }
+  .hg-hint::after { content: ''; }
+}

@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "mockup",
+      "name": "instrument",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8901", "--directory", "instrument/mockup"],
+      "runtimeArgs": ["-m", "http.server", "8901", "--directory", "instrument"],
       "port": 8901
     }
   ]
