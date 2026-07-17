@@ -72,9 +72,8 @@ svg text { font-family: var(--font-body); }
     <button onclick="toggle()">switch theme</button>
   </div>
   <svg id="fig" viewBox="0 0 760 560" width="100%" aria-label="Patent-style drawing of the choral hurdy-gurdy"></svg>
-  <p class="caption">Every turn of the crank plays a chorale no one has heard
-  before — composed, verified against the laws of voice leading, and
-  numbered, <em>in your browser</em>.</p>
+  <p class="caption">Every turn of the crank plays a chorale that has never
+  been heard — composed and verified <em>in your browser</em>.</p>
 </div>
 <script>
 const PIECE = {"notes": [[0,0,2,71],[0,2,2,76],[0,4,2,74],[0,6,1,72],[0,7,1,71],[0,8,2,71],[0,10,2,72],[0,12,2,72],[0,14,2,71],[0,16,2,69],[0,18,2,67],[0,20,2,66],[0,22,2,67],[0,24,2,69],[0,26,2,67],[1,0,2,65],[1,2,2,64],[1,4,2,66],[1,6,2,67],[1,8,2,67],[1,10,2,64],[1,12,2,64],[1,14,2,62],[1,16,2,60],[1,18,1,60],[1,19,1,59],[1,20,2,62],[1,22,2,62],[1,24,2,60],[1,26,2,59],[2,0,2,59],[2,2,2,60],[2,4,2,57],[2,6,2,55],[2,8,1,55],[2,9,1,57],[2,10,2,60],[2,12,2,57],[2,14,2,55],[2,16,1,55],[2,17,1,53],[2,18,2,52],[2,20,2,50],[2,22,2,50],[2,24,2,48],[2,26,2,50],[3,0,2,43],[3,2,2,48],[3,4,2,50],[3,6,2,52],[3,8,1,52],[3,9,1,50],[3,10,2,48],[3,12,2,45],[3,14,2,43],[3,16,2,45],[3,18,2,48],[3,20,1,46],[3,21,1,45],[3,22,2,43],[3,24,2,36],[3,26,2,43]], "ferm": [8, 18, 26], "total": 28};
@@ -111,9 +110,6 @@ function draw() {
   const t1 = el('text', {x:36, y:34, fill:txt, 'font-size':15,
                 'letter-spacing':'0.14em'}, svg);
   t1.textContent = 'FIG. 1 — CHORAL HURDY-GURDY';
-  const t2 = el('text', {x:36, y:52, fill:sub, 'font-size':10,
-                'letter-spacing':'0.1em'}, svg);
-  t2.textContent = 'AN INFINITE LIBRARY OF VERIFIED CHORALES, HAND-CRANKED';
 
   // ---- cabinet ----
   const BX = 36, BY = 76, BW = 640, BH = 380;
@@ -233,7 +229,7 @@ function draw() {
   el('rect', {x:BX+348, y:LY+8, width:88, height:30, rx:2, fill:sienna}, svg);
   const mt = el('text', {x:BX+392, y:LY+27, fill:bg, 'font-size':11,
                 'letter-spacing':'0.1em', 'text-anchor':'middle'}, svg);
-  mt.textContent = 'MOTOR';
+  mt.textContent = '▸ MOTOR';
   // bpm odometer
   el('rect', {x:BX+348, y:LY+44, width:88, height:22, fill:surface,
               stroke:border, 'stroke-width':1}, svg);
@@ -275,14 +271,8 @@ function draw() {
     });
   }
   const compact = document.documentElement.clientWidth < 560;
-  if (!compact) {
-    note(PH, TY+TH+10, PH+6, BY+BH+78, ['PLAYHEAD — the present moment'], 'start');
-    note(BX+174, LY+64, BX+110, BY+BH+42, ['PLATE — each piece numbered,', 'composed & verified on arrival'], 'start');
-    note(BX+436, LY+23, BX+474, BY+BH+24, ['MOTOR — let it play itself'], 'start');
-    note(CXc+16, CYc-29, CXc-36, BY+BH+66, ['CRANK — scroll to turn.', 'your speed is the tempo.'], 'end');
-  } else {
-    note(CXc+16, CYc-29, CXc-70, BY+BH+50, ['CRANK — drag to turn'], 'end');
-  }
+  note(CXc+16, CYc-29, CXc-40, BY+BH+54,
+       [compact ? 'drag to turn' : 'scroll to turn'], 'end');
 }
 
 function toggle() {

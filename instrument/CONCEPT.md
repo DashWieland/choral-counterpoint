@@ -125,10 +125,18 @@ changes feel mechanical, not quantized.
 - A standalone single-file `index.html` build also lives in the repo for
   anyone who clones it — same TS module, no site dependencies.
 
-## Copy (one line under the machine, essayist register)
+## Copy discipline
 
-> Every turn of the crank plays a chorale no one has heard before — composed,
-> verified against the laws of voice leading, and numbered, in your browser.
+One sentence under the machine, maximum:
+
+> Every turn of the crank plays a chorale that has never been heard —
+> composed and verified in your browser.
+
+Part labels are terse or absent. The crank gets `scroll to turn` (the one
+non-obvious affordance); the playhead, plate, and motor explain themselves.
+No poetic appositives, no explaining what a music box is. (Dash, reviewing
+the first mockup: decorative caption flourishes read as LLM text — trust
+the visualization.)
 
 ## Risks, named
 
