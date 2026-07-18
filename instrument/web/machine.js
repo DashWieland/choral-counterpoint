@@ -72,7 +72,7 @@ export function mountHurdyGurdy(container, opts = {}) {
     opts.piece || Number(new URLSearchParams(location.search).get('piece')) || 1);
 
   container.innerHTML = `
-  <div class="hg" style="position:relative; user-select:none; touch-action:none;">
+  <div class="hg" style="position:relative; user-select:none;">
     <div class="hg-title">CHORAL HURDY-GURDY</div>
     <div class="hg-cabinet">
       <div class="hg-tapeframe"><canvas class="hg-tape"></canvas></div>
@@ -84,6 +84,8 @@ export function mountHurdyGurdy(container, opts = {}) {
         <div class="hg-controls">
           <button class="hg-motor" type="button">&#9656; MOTOR</button>
           <div class="hg-bpm">000 BPM</div>
+          <input type="range" class="hg-bpm-set" min="40" max="120" step="1"
+                 value="66" aria-label="motor tempo">
         </div>
         <div class="hg-crankunit">
           <svg class="hg-crank" viewBox="0 0 120 132" aria-hidden="true">
@@ -118,6 +120,8 @@ export function mountHurdyGurdy(container, opts = {}) {
   const motorBtn = root.querySelector('.hg-motor');
   const exportA = root.querySelector('.hg-export');
   const crankRot = root.querySelector('.hg-crank-rot');
+  const crankUnit = root.querySelector('.hg-crankunit');
+  const bpmSet = root.querySelector('.hg-bpm-set');
   const ctx2d = canvas.getContext('2d');
 
   // ---- state ----
@@ -126,6 +130,7 @@ export function mountHurdyGurdy(container, opts = {}) {
   let bpm = 0;                   // signed: negative = retrograde
   let bpmTarget = 0;
   let motorOn = false;
+  let motorBpm = MOTOR_BPM;
   let lastUserInput = -1e9;
   let crankAngle = 2.4;            // at rest the arm hangs low, as cranks do
   let choir = null, audioCtx = null;
@@ -145,8 +150,9 @@ export function mountHurdyGurdy(container, opts = {}) {
     };
   }
   refreshColors();
-  new MutationObserver(refreshColors)
-    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  const themeObserver = new MutationObserver(refreshColors);
+  themeObserver.observe(document.documentElement,
+    { attributes: true, attributeFilter: ['data-theme'] });
 
   let flat = [];
   let perfAt = [];                 // source eighth -> performance eighth
@@ -197,7 +203,7 @@ export function mountHurdyGurdy(container, opts = {}) {
   // ---- physics + transport ----
   function tick(dt) {
     const idle = performance.now() / 1000 - lastUserInput > 1.2;
-    if (motorOn && idle) bpmTarget += (MOTOR_BPM - bpmTarget) * Math.min(1, dt * 2.5);
+    if (motorOn && idle) bpmTarget += (motorBpm - bpmTarget) * Math.min(1, dt * 2.5);
     else bpmTarget *= Math.exp(-dt / 1.4);
     bpmTarget = Math.max(-MAX_BPM, Math.min(MAX_BPM, bpmTarget));
     bpm += (bpmTarget - bpm) * Math.min(1, dt * 6);   // smooths wheel-tick pulses
@@ -353,23 +359,23 @@ export function mountHurdyGurdy(container, opts = {}) {
     lastUserInput = performance.now() / 1000;
     bpmTarget = Math.max(-MAX_BPM, Math.min(MAX_BPM, bpmTarget + delta));
   }
-  root.addEventListener('wheel', e => {
+  crankUnit.addEventListener('wheel', e => {
     e.preventDefault();
     impulse(-e.deltaY * 0.12);
   }, { passive: false });
   let dragY = null;
-  root.addEventListener('pointerdown', e => {
-    if (e.target.closest('button, a')) return;   // don't steal control clicks
+  crankUnit.addEventListener('pointerdown', e => {
     dragY = e.clientY;
-    root.setPointerCapture(e.pointerId);
+    crankUnit.setPointerCapture(e.pointerId);
     ensureAudio();
   });
-  root.addEventListener('pointermove', e => {
+  crankUnit.addEventListener('pointermove', e => {
     if (dragY === null) return;
     impulse((dragY - e.clientY) * 0.5);
     dragY = e.clientY;
   });
-  root.addEventListener('pointerup', () => { dragY = null; });
+  crankUnit.addEventListener('pointerup', () => { dragY = null; });
+  bpmSet.addEventListener('input', () => { motorBpm = Number(bpmSet.value); });
   motorBtn.addEventListener('click', () => {
     ensureAudio();
     motorOn = !motorOn;
@@ -377,21 +383,36 @@ export function mountHurdyGurdy(container, opts = {}) {
     motorBtn.classList.toggle('hg-motor-on', motorOn);
     if (motorOn && Math.abs(bpmTarget) < MIN_AUDIBLE_BPM) bpmTarget = MIN_AUDIBLE_BPM + 1;
   });
-  document.addEventListener('visibilitychange', () => {
+  const onVisibility = () => {
     if (document.hidden) {
       bpm = 0; bpmTarget = 0;
       if (choir) { choir.releaseAll(0.2); sounding.clear(); }
     }
-  });
+  };
+  document.addEventListener('visibilitychange', onVisibility);
 
   // ---- loop ----
   let last = performance.now();
+  let rafId = 0;
+  let disposed = false;
   function frame(now) {
+    if (disposed) return;
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     tick(dt);
     draw();
-    requestAnimationFrame(frame);
+    rafId = requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  rafId = requestAnimationFrame(frame);
+
+  // teardown for SPA navigation: stop the loop, silence the choir, detach
+  return function unmount() {
+    disposed = true;
+    cancelAnimationFrame(rafId);
+    document.removeEventListener('visibilitychange', onVisibility);
+    themeObserver.disconnect();
+    if (choir) { choir.releaseAll(0.05); sounding.clear(); }
+    if (audioCtx) audioCtx.close();
+    container.innerHTML = '';
+  };
 }
