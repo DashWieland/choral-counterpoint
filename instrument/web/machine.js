@@ -134,6 +134,7 @@ export function mountHurdyGurdy(container, opts = {}) {
   let lastUserInput = -1e9;
   let crankAngle = 2.4;            // at rest the arm hangs low, as cranks do
   let choir = null, audioCtx = null;
+  let dragging = () => false;
   const sounding = new Map();    // eventKey -> handle
   let colors = null;
 
@@ -213,7 +214,8 @@ export function mountHurdyGurdy(container, opts = {}) {
       sounding.clear();
     }
     if (audible) pos += (bpm / 60) * 2 * dt;
-    crankAngle += (bpm / 60) * 2 * Math.PI * dt * 0.5;
+    if (dragging()) { /* the finger owns the arm */ }
+    else crankAngle += (bpm / 60) * 2 * Math.PI * dt * 0.5;
     crankRot.style.transform = `rotate(${crankAngle}rad)`;
     crankRot.style.transformOrigin = '60px 60px';
 
@@ -363,18 +365,47 @@ export function mountHurdyGurdy(container, opts = {}) {
     e.preventDefault();
     impulse(-e.deltaY * 0.12);
   }, { passive: false });
-  let dragY = null;
+
+  // drag = real cranking: the arm follows the finger's angle around the hub
+  // (jog-wheel style); on release the flywheel coasts from the last speed.
+  // A vertical swipe past the hub is an arc around it, so straight swipes
+  // still work. Clockwise is forward; circling backward plays retrograde.
+  const crankSvg = crankUnit.querySelector('.hg-crank');
+  let dragAngle = null, dragTime = 0;
+  dragging = () => dragAngle !== null;
+  const angleAt = e => {
+    const b = crankSvg.getBoundingClientRect();
+    const cx = b.x + b.width * (60 / 120), cy = b.y + b.height * (60 / 132);
+    const dx = e.clientX - cx, dy = e.clientY - cy;
+    return Math.hypot(dx, dy) < 10 ? null : Math.atan2(dy, dx);
+  };
   crankUnit.addEventListener('pointerdown', e => {
-    dragY = e.clientY;
-    crankUnit.setPointerCapture(e.pointerId);
+    dragAngle = angleAt(e);
+    dragTime = performance.now();
+    try { crankUnit.setPointerCapture(e.pointerId); } catch {}
     ensureAudio();
+    lastUserInput = performance.now() / 1000;
   });
   crankUnit.addEventListener('pointermove', e => {
-    if (dragY === null) return;
-    impulse((dragY - e.clientY) * 0.5);
-    dragY = e.clientY;
+    if (dragAngle === null) { dragAngle = angleAt(e); return; }
+    const a = angleAt(e);
+    if (a === null) return;                      // finger over the hub center
+    let d = a - dragAngle;
+    if (d > Math.PI) d -= 2 * Math.PI;
+    if (d < -Math.PI) d += 2 * Math.PI;
+    dragAngle = a;
+    const now = performance.now();
+    const dt = Math.max(0.008, (now - dragTime) / 1000);
+    dragTime = now;
+    crankAngle += d;                             // the arm is in your hand
+    const gestureBpm = (d / dt) * 60 / Math.PI;  // 1 revolution = 2 beats
+    bpmTarget = Math.max(-MAX_BPM, Math.min(MAX_BPM,
+      0.6 * bpmTarget + 0.4 * gestureBpm));
+    lastUserInput = now / 1000;
   });
-  crankUnit.addEventListener('pointerup', () => { dragY = null; });
+  const endDrag = () => { dragAngle = null; };
+  crankUnit.addEventListener('pointerup', endDrag);
+  crankUnit.addEventListener('pointercancel', endDrag);
   bpmSet.addEventListener('input', () => { motorBpm = Number(bpmSet.value); });
   motorBtn.addEventListener('click', () => {
     ensureAudio();
