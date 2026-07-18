@@ -165,3 +165,35 @@ the visualization.)
 3. Audio port; A/B against perform.py renders by ear.
 4. Crank physics + scheduler; tape renderer.
 5. Integration into dash_website + handoff to the publishing agent.
+
+
+---
+
+## As shipped (2026-07-18) — deltas from this concept
+
+The concept above is the record of intent; the shipped machine differs where
+Dash's play-testing taught us better:
+
+- **No FIG. 1, no annotations, no "0 VIOLATIONS."** The patent-drawing
+  *vocabulary* (hatching, rules, engraved mono) survived; the patent-drawing
+  *framing* didn't earn its place once the machine read as a music box on
+  its own. Jargon left the plate. Eleven words of text remain.
+- **Front crank, not side crank.** A flat frontal drawing cannot honestly
+  depict a side crank (it would be edge-on). Shipped: barrel-organ front
+  crank — bolted bearing plate, arm, grip, dashed swing path — inside the
+  control row. Drag tracks the finger's angle around the hub (jog-wheel);
+  release hands off to the flywheel. One revolution = two beats, the same
+  gearing as the motor's visual.
+- **Tape x-axis is performance time.** Fermata chords draw twice as wide and
+  the playhead moves linearly. (Drawn-width ≠ heard-length was the single
+  most disorienting bug of play-testing.)
+- **Pieces crossfade** (~1.4 s release into the reverb while the next piece
+  attacks) instead of breathing in silence — radio, not hymnal.
+- **Tempo slider** (40–120) sets the motor; cranking overrides temporarily.
+- **Capture is crank-only.** The cabinet face scrolls the page; only the
+  crank captures wheel/drag. (The concept's "pointer-over the machine"
+  capture was still too grabby in practice.)
+- **Mobile:** under 560px the plate takes its own row; coarse pointers get
+  44px-floor targets and a fattened slider thumb.
+- **SPA teardown:** mount returns a dispose function; navigation silences
+  the machine.

@@ -25,6 +25,11 @@ engine/                           # fully automatic composition (no LLM in the l
 └── serve.py                      # HTTP server: /compose, /compose.mid, /next
                                   #   (compose-ahead buffer for instruments)
 
+instrument/web/                   # the Choral Hurdy-Gurdy: the engine ported to JS,
+│                                 #   a WebAudio choir, and a crankable music box —
+│                                 #   live at apophenia.blog/work/choral-hurdy-gurdy
+│                                 #   (CONCEPT.md alongside is the design record)
+
 tools/                            # rebuild / validation harnesses (need music21)
 ├── mine_oracle.py                # regenerates the oracle table from the corpus
 ├── mine_ornaments.py             # regenerates Bach's figuration rates
