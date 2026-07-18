@@ -105,8 +105,22 @@
   color: var(--color-text-secondary);
 }
 @media (max-width: 560px) {
-  .hg-plate { min-width: 0; flex: 1; }
+  /* two rows: the plate keeps its engraved proportions on its own line;
+     controls and crank share the second row, crank on the thumb side */
   .hg-panel { gap: 12px; flex-wrap: wrap; }
-  .hg-crank { width: 92px; height: 102px; }
+  .hg-plate { flex: 1 1 100%; min-width: 0; }
+  .hg-controls { flex: 1; }
+  .hg-crank { width: 104px; height: 114px; }
   .hg-hint { font-size: 0.56rem; }
+}
+
+/* touch: real finger targets (44px floor), no tap-flash, no zoom-delay */
+.hg button, .hg a, .hg input { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (pointer: coarse) {
+  .hg-motor { min-height: 44px; }
+  .hg-bpm-set { height: 32px; }
+  .hg-bpm-set::-webkit-slider-runnable-track { margin-top: 0; }
+  .hg-bpm-set::-webkit-slider-thumb { width: 22px; height: 26px; margin-top: -12px; }
+  .hg-bpm-set::-moz-range-thumb { width: 22px; height: 26px; }
+  .hg-export { padding: 12px 0; }
 }
