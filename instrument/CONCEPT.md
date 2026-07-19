@@ -128,12 +128,18 @@ changes feel mechanical, not quantized.
 
 ## Copy discipline
 
-One sentence under the machine, maximum:
+The blog page carries the editorial framing (the numbered library reads as
+Borges's Library of Babel with the nonsense filtered out — every valid
+chorale already at some address; cranking is looking-up). The standalone
+demo keeps one terse, TRUTHFUL sentence:
 
-> Every turn of the crank plays a chorale that has never been heard —
-> composed and verified in your browser.
+> An endless, numbered library of chorales, each composed and verified in
+> your browser. Piece No. N is the same for everyone who finds it; the
+> unheard music is further out.
 
-Part labels are terse or absent. The crank gets `scroll to turn` (the one
+(Correction, 2026-07-18: the earlier "a chorale that has never been heard"
+was false — determinism means the low numbers everyone shares. The unheard
+music is only at unreached addresses.) Part labels are terse or absent. The crank gets `scroll to turn` (the one
 non-obvious affordance); the playhead, plate, and motor explain themselves.
 No poetic appositives, no explaining what a music box is. (Dash, reviewing
 the first mockup: decorative caption flourishes read as LLM text — trust
