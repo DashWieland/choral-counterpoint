@@ -1,8 +1,8 @@
 # choral-counterpoint
 
-A self-contained **engine that composes and verifies four-part chorales endlessly** — Bach-style SATB harmonization and Fuxian species counterpoint, for any key, mode, melody, and tempo, with no LLM in the loop at run time. It ships three ways: a Python composer and server, a dependency-free JavaScript port, and a crankable web music box — the **[Choral Hurdy-Gurdy](https://apophenia.blog/work/choral-hurdy-gurdy)** — that composes a new, never-before-heard chorale for every turn of the handle.
+An engine that composes verified four-part chorales without end, and without a language model in the loop. It harmonizes in the style of Bach and writes species counterpoint in the style of Fux, over any key, mode, melody, and tempo. It ships three ways: a Python composer and server, a dependency-free JavaScript port, and a crankable web music box — the **[Choral Hurdy-Gurdy](https://apophenia.blog/work/choral-hurdy-gurdy)** — that composes a new, never-before-heard chorale for every turn of the handle.
 
-It began as a Claude Code *skill* — a rulebook and set of checkers an LLM used to compose one careful piece at a time. That skill is still here (`.claude/skills/`), and it's where the musical knowledge is authored. But the checkers, the corpus oracle, and the taste tables it depends on turned out to be enough to compose *without* a model in the loop: search the space of bass lines Bach would actually write, fill the inner voices under the voice-leading laws as hard constraints, verify every note, and keep only what survives. The result is infinite by construction and deterministic — piece No. *N* is the same piece for everyone, forever.
+It began as a Claude Code *skill*: a rulebook and a set of checkers a language model used to compose one careful piece at a time. That skill is still here, under `.claude/skills/`, and it is where the musical knowledge is authored. But the checkers, the corpus oracle, and the mined taste tables turned out to be enough to compose without the model at all — search the bass lines Bach would actually write, fill the inner voices under the voice-leading laws as hard constraints, verify every note, keep only what survives. What comes out is infinite by construction and fully deterministic. Piece No. *N* is the same piece for everyone, forever.
 
 ## Why these styles work when "write me a song" doesn't
 
@@ -38,7 +38,7 @@ tools/                            # rebuild / validation harnesses (need music21
 ├── validate_checker.py           # runs the checker over Bach himself (false-alarm test)
 └── perform.py                    # choir-ish synthesizer: score JSON → WAV
 
-out/                              # example compositions (JSON + MIDI + WAV)
+out/                              # the FABE chorale + the packaged skill
 ```
 
 Three layers, one discipline:
@@ -59,13 +59,9 @@ Three layers, one discipline:
 
 Copy `.claude/skills/choral-counterpoint/` into your project's `.claude/skills/` directory (or drop the packaged `out/choral-counterpoint.skill` zip into a client that accepts skill packages). The scripts need Python 3; `render_midi.py` needs `mido`. The `tools/` harnesses additionally need `music21` (only for rebuilding/validating — the skill itself ships with the mined table).
 
-## Example
+## The FABE chorale
 
-`out/fabe_chorale.{json,mid}` is a three-phrase chorale in D minor composed by Claude with this skill, signed with the motif **F–A–B♭–E** — *Fable* in German note-spelling, after the model that wrote it. `out/demo_*` are the original end-to-end validation pieces.
-
-## Provenance
-
-Built in July 2026 by Claude (Fable 5) working with Dash Wieland. It started as a research question — can an LLM scaffold itself into a compositional discipline by encoding the rules, building the verifier, and mining the corpus for taste? — and the answer turned out to generalize past the LLM: once the rules and taste were captured well enough for a model to lean on, they were enough to compose without one. The checker and oracle were built from the `music21` Bach corpus and validated clean-room, leave-one-out, against Bach's own harmonizations. The first piece the skill composed, `out/fabe_chorale`, is Claude's, signed **F–A–B♭–E**.
+`out/fabe_chorale.{json,mid,wav}` is the first piece composed with the skill: a three-phrase chorale in D minor, signed by Claude with the motif **F–A–B♭–E** — which spells *Fable*, in German note-nomenclature, after the model that wrote it. The trick is Bach's own; he wove B–A–C–H into the unfinished fugue that closes *The Art of Fugue*.
 
 ## License
 

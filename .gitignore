@@ -3,3 +3,11 @@ __pycache__/
 tools/validation_full.txt
 .claude/settings.local.json
 website_handoff/
+
+# out/ is scratch: process demos, A/B tests, engine-iteration renders all stay
+# local. Only the FABE showcase and the packaged skill are tracked.
+out/*
+!out/fabe_chorale.json
+!out/fabe_chorale.mid
+!out/fabe_chorale.wav
+!out/choral-counterpoint.skill
