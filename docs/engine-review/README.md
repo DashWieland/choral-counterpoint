@@ -42,16 +42,16 @@ Nothing a listener hears changes until you release Edition 2.
 | Decision | Recommendation |
 |---|---|
 | Adopt editions: old links play Edition 1 forever; the crank moves to Edition 2 at release | Yes. It is built in #2, and nothing is audible until release. |
-| Release the fixes on their own, or hold Edition 2 for bar form | Hold and release once: an edition is a promise to keep every address forever, and the plate will show it. If bar form stalls, release the fixes alone. Until then, about one piece in 160 keeps ending off the tonic. |
+| Release the fixes on their own, or hold Edition 2 for bar form | **Hold (26 Sept, with bar form).** Release once: an edition is a promise to keep every address forever, and the plate will show it. If bar form stalls, release the fixes alone. Until then, about one piece in 160 keeps ending off the tonic. |
 | The edition mark on the plate | Keep the quiet `· ED. 2` built in #2, shown only past Edition 1. |
-| Bar form: repeat the opening phrases literally or re-harmonize them | Literal, so the form is audible (many of Bach's hymn settings write it once under a repeat sign). Let the closing reprise be re-harmonized so the ending still moves. |
-| Piece length under the crank | Accept bar form's length: a median of 46 seconds at the machine's 66 bpm, against 16 today. |
+| Bar form: repeat the opening phrases literally or re-harmonize them | **Literal (26 Sept).** In the listening session the two were hard to tell apart, so the tie-breakers decide: many of Bach's hymn settings write the Stollen once under a repeat sign, and a copied repeat is a smaller search. The closing reprise is still re-harmonized, so the ending moves. |
+| Piece length under the crank | **Accepted (26 Sept)** with bar form: a median of 46 seconds at the machine's 66 bpm, against 16 today. |
 | The plate's "N PHRASES" | Show the real phrase count, which the planner can report. |
-| Settings ("No. 214, setting 2") on the machine | Yes, later. It renumbers nothing. |
+| Settings ("No. 214, setting 2") on the machine | **Parked (26 Sept).** In the listening session three settings of one tune were hard to tell apart. |
 | Bring your own tune, on the site | Optional, after the release. |
 | An Edition 3 with modulation | Worth a research lane once bar form ships. |
 
-Before deciding the bar-form rows, listen to the examples in `docs/engine-review/examples/`, described under **Length and form** below.
+Dash listened to the examples on 26 September and chose bar form. `tools/lab/listening.mjs` renders them as WAV files with the project's choir at 66 bpm, with a page that plays each pair side by side.
 
 ## Findings
 
@@ -219,6 +219,8 @@ For each tune the engine plays one harmonization, the beam's best, out of billio
 
 Bach set the same tune many times: the St Matthew Passion uses one chorale melody in five movements, with four different harmonizations. The machine could offer "No. 214, setting 2", where setting 1 is the edition's piece, so nothing renumbers. `docs/engine-review/examples/settings-0006-{1,2,3}.mid` are three settings of one G-major tune.
 
+**Parked.** In the listening session the three settings were hard to tell apart. No. 6 changes its chords about as often as the average (38% against 37%) but its bass less than most (16%, in the bottom tenth of the 290 tunes).
+
 ### Modulation
 
 Every phrase in the machine cadences in the home key. The engine does tonicize: it offers a secondary dominant wherever the next bass note is its target, and about a quarter of pieces have one. But it never establishes a new key. Bach's inner cadences usually land in a related key (the dominant, or the relative major or minor), and that key plan is a chorale's largest-scale structure.
@@ -287,12 +289,12 @@ Both engines change in the same commit; Python is a sibling, checked by its own 
 5. **Bar form**, next.
    - Port the planner and correct its thirds.
    - Let C and D tunes end low again.
-   - Settle the repeat and the plate.
+   - The repeat is literal; the plate shows the real phrase count.
    - Then a listening session: matched key, register and tempo, per CLAUDE.md.
 6. **Release Edition 2.**
    - Freeze `engine.js` as `engine-ed2.js` with a golden file, raise `RELEASED` and `CURRENT`, and re-vendor.
    - Rewrite the lines on the site page that aren't true. They are your prose, so the rewrites are yours: "every chorale that obeys the rules already sits at some address", "the music no one has heard is further out", the G example (the 25th G phrase arrives by No. 100,080), and "infinite".
-7. **After the release.** Settings, then bring-your-own-tune.
+7. **After the release.** Bring-your-own-tune. Settings are parked.
 8. **Edition 3, if you want it: modulation.** Research first: re-mining the oracle needs music21 and the corpus, and `tools/cleanroom_eval.py` measures the result against Bach.
 
 **The site.** After #1 merges, re-vendor `engine.js`, `log1p.js` and `machine.js`; the CSS already matches. After #2, add `engine-ed1.js` and `tables-ed1.js`.
