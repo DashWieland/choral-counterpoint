@@ -4,10 +4,10 @@
 // inner-voice beam search under the voice-leading laws -> checker gate ->
 // corpus-rate ornamentation (with its own surface checker as the gate).
 //
-// This file is the WORKING COPY of the next edition. Released editions are
-// frozen in their own files (engine-ed1.js, engine-ed2.js) and machine.js
-// maps ?ed= to them; within an edition, piece N is the same piece for
-// everyone, forever. Right after a release it is identical to the latest.
+// This is the engine the machine plays: piece N is the same piece for
+// everyone. golden.mjs checks pieces 1..20,000 against golden.json, so a
+// change that would alter them fails loudly; when the engine changes on
+// purpose, re-record golden.json in the same commit (see CLAUDE.md).
 
 import { TABLES } from './tables.js';
 import { log1p } from './log1p.js';

@@ -224,9 +224,11 @@ Dash's play-testing taught us better:
   next edition. `?ed=` picks an edition; a link without it is Edition 1,
   and a fresh visit plays the current edition. Past Edition 1, the plate
   adds `· ED. N` and the MIDI file is named `-edN`. Edition 2 (bar form
-  and the engine review's fixes) was released on 2026-09-26, frozen in
-  `engine-ed2.js` with `tables-ed2.js`.
-- **Bar form** (2026-09, released as Edition 2 on 2026-09-26).
+  and the engine review's fixes) was released on 2026-09-26, and later that
+  day Dash retired editions: Edition 2 is strictly better, so it rolled out
+  fully. Every address now plays engine.js, an old link opens the new piece
+  at its number, and the plate carries no edition mark.
+- **Bar form** (2026-09, the machine's engine since 2026-09-26).
   Lutheran chorale tunes are Stollen, Stollen, Abgesang, so the planner
   writes that: one or two phrases sung twice, then two or three new ones,
   sometimes ending on the Stollen's last phrase again. Pieces run 4 to 8
