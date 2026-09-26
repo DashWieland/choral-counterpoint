@@ -1,7 +1,8 @@
-// EDITION 1, FROZEN. This is the engine every ?piece=N link without ?ed=
-// plays, byte for byte as it shipped (with its own frozen tables-ed1.js).
-// Never edit it: golden.mjs checks pieces 1..20,000 against golden-ed1.json.
-// New work goes in engine.js, which becomes the next edition.
+// EDITION 1, RETIRED on 2026-09-26: the machine no longer plays it (every
+// address now plays engine.js). It stays, byte for byte as it shipped with
+// its tables-ed1.js, as the reference the engine lab (tools/lab) measures
+// its flags against; verify.mjs checks the lab still reproduces it. Never
+// edit its body.
 //
 // The composition engine, ported from the auto_compose Python engine.
 // Composes a verified four-voice chorale from a seed in ~milliseconds:

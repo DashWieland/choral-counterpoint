@@ -38,13 +38,13 @@ There are three problems.
 - [#6](https://github.com/DashWieland/choral-counterpoint/pull/6): bar form in Edition 2.
 - [#7](https://github.com/DashWieland/choral-counterpoint/pull/7): Edition 2 released, frozen in `engine-ed2.js`; [dash_website#78](https://github.com/DashWieland/dash_website/pull/78) puts it on the site.
 
-A fresh visit now plays Edition 2. Every link shared before it keeps its Edition 1 piece.
+Later that day Dash retired editions: Edition 2 is strictly better, so every address now plays it, and old links open the new piece at their number.
 
 ## Decisions for you
 
 | Decision | Recommendation |
 |---|---|
-| Adopt editions: old links play Edition 1 forever; the crank moves to Edition 2 at release | Yes. It is built in #2, and nothing is audible until release. |
+| Adopt editions: old links play Edition 1 forever; the crank moves to Edition 2 at release | **Adopted, then retired (26 Sept).** Once Edition 2 was out, Dash chose to roll it out fully rather than keep Edition 1 reachable. |
 | Release the fixes on their own, or hold Edition 2 for bar form | **Hold (26 Sept, with bar form); released the same day.** Release once: an edition is a promise to keep every address forever, and the plate will show it. If bar form stalls, release the fixes alone. Until then, about one piece in 160 keeps ending off the tonic. |
 | The edition mark on the plate | Keep the quiet `· ED. 2` built in #2, shown only past Edition 1. |
 | Bar form: repeat the opening phrases literally or re-harmonize them | **Literal (26 Sept).** In the listening session the two were hard to tell apart, so the tie-breakers decide: many of Bach's hymn settings write the Stollen once under a repeat sign, and a copied repeat is a smaller search. The closing reprise is still re-harmonized, so the ending moves. |

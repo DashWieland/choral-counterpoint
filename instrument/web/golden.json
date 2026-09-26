@@ -1,6 +1,6 @@
 {
- "edition": 2,
- "note": "composePiece(n) of instrument/web/engine-ed2.js. Never rewrite this file to make a test pass: a mismatch means ?piece=N&ed=2 links now play different music.",
+ "engine": "instrument/web/engine.js",
+ "note": "composePiece(n) of engine.js: the pieces the machine plays (Edition 2, bar form, the only edition since 2026-09-26). Re-record only when the engine changes on purpose, in the same commit: node golden.mjs --write --replace. A mismatch otherwise means ?piece=N links now play different music.",
  "pieces": {
   "1": "eefdd066720e2058",
   "2": "9aaaefeac6ff2616",
