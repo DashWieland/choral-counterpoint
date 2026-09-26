@@ -30,21 +30,22 @@ There are three problems.
 - **A and B: eight small changes, now Edition 2's engine.** The first draft is kept at 97.7% of addresses, up from 63.2%. No piece ends off the tonic and no soprano leaves its range. Every key is equally easy, and the engine makes 44% fewer harmonization attempts.
 - **C: bar form.** The planner writes chorale tunes as their opening phrases stated twice, then new ones. As built in #6, its pieces average 44 chords, 96.9% of the first 20,000 addresses keep their first draft, and only 4 of them share a tune. After form comes modulation.
 
-**What's built.** Almost every change renumbers much of the library, so existing links stay on a frozen Edition 1 and the improvements form Edition 2:
-- [#1](https://github.com/DashWieland/choral-counterpoint/pull/1): Edition 1 hardening, merged.
-- [#5](https://github.com/DashWieland/choral-counterpoint/pull/5): the machine's CSS taken verbatim from the site (the commit #1 missed), ready.
-- [#2](https://github.com/DashWieland/choral-counterpoint/pull/2): editions, ready.
-- [#3](https://github.com/DashWieland/choral-counterpoint/pull/3): Edition 2's fixes, draft, on #2.
-- [#6](https://github.com/DashWieland/choral-counterpoint/pull/6): bar form in Edition 2, draft, on #3.
+**What's built.** Almost every change renumbers much of the library, so existing links stay on a frozen Edition 1 and the improvements form Edition 2, released on 26 September:
+- [#1](https://github.com/DashWieland/choral-counterpoint/pull/1): Edition 1 hardening.
+- [#5](https://github.com/DashWieland/choral-counterpoint/pull/5): the machine's CSS taken verbatim from the site (the commit #1 missed).
+- [#2](https://github.com/DashWieland/choral-counterpoint/pull/2): editions.
+- [#3](https://github.com/DashWieland/choral-counterpoint/pull/3): Edition 2's fixes.
+- [#6](https://github.com/DashWieland/choral-counterpoint/pull/6): bar form in Edition 2.
+- [#7](https://github.com/DashWieland/choral-counterpoint/pull/7): Edition 2 released, frozen in `engine-ed2.js`; [dash_website#78](https://github.com/DashWieland/dash_website/pull/78) puts it on the site.
 
-Nothing a listener hears changes until you release Edition 2.
+A fresh visit now plays Edition 2. Every link shared before it keeps its Edition 1 piece.
 
 ## Decisions for you
 
 | Decision | Recommendation |
 |---|---|
 | Adopt editions: old links play Edition 1 forever; the crank moves to Edition 2 at release | Yes. It is built in #2, and nothing is audible until release. |
-| Release the fixes on their own, or hold Edition 2 for bar form | **Hold (26 Sept, with bar form).** Release once: an edition is a promise to keep every address forever, and the plate will show it. If bar form stalls, release the fixes alone. Until then, about one piece in 160 keeps ending off the tonic. |
+| Release the fixes on their own, or hold Edition 2 for bar form | **Hold (26 Sept, with bar form); released the same day.** Release once: an edition is a promise to keep every address forever, and the plate will show it. If bar form stalls, release the fixes alone. Until then, about one piece in 160 keeps ending off the tonic. |
 | The edition mark on the plate | Keep the quiet `· ED. 2` built in #2, shown only past Edition 1. |
 | Bar form: repeat the opening phrases literally or re-harmonize them | **Literal (26 Sept).** In the listening session the two were hard to tell apart, so the tie-breakers decide: many of Bach's hymn settings write the Stollen once under a repeat sign, and a copied repeat is a smaller search. The closing reprise is still re-harmonized, so the ending moves. |
 | Piece length under the crank | **Accepted (26 Sept)** with bar form: a median of 46 seconds at the machine's 66 bpm, against 16 today. |
@@ -300,13 +301,13 @@ Both engines change in the same commit; Python is a sibling, checked by its own 
    - The repeat is literal; the plate shows the real phrase count.
    - `compose.py` takes the same design (`engine/census.py`: first draft kept 96.9% over 2,520 pieces).
    - Then a listening session: matched key, register and tempo, per CLAUDE.md.
-6. **Release Edition 2.**
-   - Freeze `engine.js` as `engine-ed2.js` with a golden file, raise `RELEASED` and `CURRENT`, and re-vendor.
-   - Rewrite the lines on the site page that aren't true. They are your prose, so the rewrites are yours: "every chorale that obeys the rules already sits at some address", "the music no one has heard is further out", the G example (the 25th G phrase arrives by No. 100,080), and "infinite".
+6. **Edition 2, released 26 September** ([#7](https://github.com/DashWieland/choral-counterpoint/pull/7), [dash_website#78](https://github.com/DashWieland/dash_website/pull/78)).
+   - `engine-ed2.js` and `tables-ed2.js` are frozen with `golden-ed2.json`; `RELEASED` and `CURRENT` are 2; the site vendors both editions.
+   - Still to do: rewrite the lines on the site page that aren't true. They are your prose, so the rewrites are yours: "every chorale that obeys the rules already sits at some address", "the music no one has heard is further out", the G example (in Edition 1 the 25th G phrase arrives by No. 100,080), and "infinite". Since the release, "No. 12,041 is the same four voices for every visitor, forever" holds per edition: the page's link keeps its Edition 1 piece, but a visitor who cranks to No. 12,041 today hears Edition 2's.
 7. **After the release.** Bring-your-own-tune. Settings are parked.
 8. **Edition 3, if you want it: modulation.** Research first: re-mining the oracle needs music21 and the corpus, and `tools/cleanroom_eval.py` measures the result against Bach.
 
-**The site.** After #1 merges, re-vendor `engine.js`, `log1p.js` and `machine.js`; the CSS already matches. After #2, add `engine-ed1.js` and `tables-ed1.js`.
+**The site.** [dash_website#77](https://github.com/DashWieland/dash_website/pull/77) re-vendored #1, and [dash_website#78](https://github.com/DashWieland/dash_website/pull/78) vendors both editions.
 
 ## Measurements
 

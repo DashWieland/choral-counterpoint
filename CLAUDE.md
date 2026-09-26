@@ -28,15 +28,18 @@ layer that skipped ground-truth confrontation shipped with bugs.
 
 1. **Piece determinism is a public contract, kept by editions.**
    `?piece=N` links exist in the wild. Edition 1 is frozen in
-   `instrument/web/engine-ed1.js` with its own `tables-ed1.js`: never edit
-   either. `node golden.mjs` checks its pieces 1–20,000 against
-   `golden-ed1.json`, and `test_engine.mjs` checks pieces 1–200 on every
-   run. `engine.js` (with `tables.js`) is the working copy of the next
-   edition, so behavior changes go there. `machine.js` maps `?ed=` to an
-   engine: a link without `?ed=` is Edition 1, a fresh visit plays
-   `CURRENT`, and a URL can open only editions up to `RELEASED`. Releasing
-   an edition means freezing `engine.js` as `engine-edN.js` with its own
-   golden file, then raising `RELEASED` and `CURRENT`. `log1p.js` freezes
+   `instrument/web/engine-ed1.js` with its own `tables-ed1.js`, and
+   Edition 2 (bar form, released 2026-09-26) in `engine-ed2.js` with
+   `tables-ed2.js`: never edit any of them. `node golden.mjs` checks each
+   edition's pieces 1–20,000 against its `golden-edN.json`, and
+   `test_engine.mjs` checks pieces 1–200 of each on every run. `engine.js`
+   (with `tables.js`) is the working copy of the next edition, so behavior
+   changes go there. `machine.js` maps `?ed=` to an engine: a link without
+   `?ed=` is Edition 1, a fresh visit plays `CURRENT` (2), and a URL can
+   open only editions up to `RELEASED` (2). Releasing an edition means
+   freezing `engine.js` and `tables.js` as `engine-edN.js` and
+   `tables-edN.js`, recording `node golden.mjs --edition N --write`, adding
+   it to `EDITIONS`, then raising `RELEASED` and `CURRENT`. `log1p.js` freezes
    the only browser-dependent maths, so a piece is also the same in every
    browser. Addresses are parsed in `machine.js`
    (`openAddress`): plain decimal, No. 1 to `MAX_SAFE_INTEGER` — one
@@ -53,7 +56,8 @@ layer that skipped ground-truth confrontation shipped with bugs.
 - JS engine batch: `cd instrument/web && node test_engine.mjs`
   (engine.js: 200/200 clean and in bar form, the Stollen repeated note for
   note with its ornaments; ends on the tonic, soprano in range, first draft
-  kept ≥90%, ~21 ms/piece; engine-ed1.js: pieces 1–200 match Edition 1)
+  kept ≥90%, ~21 ms/piece; engine-ed1.js and engine-ed2.js: pieces 1–200
+  match their golden files)
 - Census of an engine: `cd instrument/web && node census.mjs 1 20000`, or
   `node census.mjs sample 2000` for addresses spread up to 2^53 (Edition 2
   with bar form: first draft kept 96.9% and 97.4%, nothing empty, off the
@@ -61,8 +65,8 @@ layer that skipped ground-truth confrontation shipped with bugs.
 - Python engine census: `python engine/census.py` (2,520 pieces, every
   tonic, mode and size: first draft kept 96.9%, every piece in bar form
   with a literal repeat, on the tonic and in range; about 3 minutes)
-- Edition 1 golden test: `cd instrument/web && node golden.mjs`
-  (pieces 1–20,000 unchanged; about five minutes)
+- Golden test: `cd instrument/web && node golden.mjs`
+  (each frozen edition's pieces 1–20,000 unchanged; about twelve minutes)
 - Machine address contract: `cd instrument/web && node test_machine.mjs`
   (`?piece=` parsing, both ends of the shelf, null-chorale skipping,
   `?ed=` editions; <1 s)
@@ -76,8 +80,10 @@ layer that skipped ground-truth confrontation shipped with bugs.
 
 Live at apophenia.blog/work/choral-hurdy-gurdy (repo DashWieland/dash_website,
 files at `components/hurdygurdy/*` + `components/HurdyGurdy.tsx` shell).
-Vendor every module `machine.js` imports: `engine.js`, `engine-ed1.js`,
-`tables.js`, `tables-ed1.js`, `log1p.js`, `audio.js`, plus the CSS. The
+Vendor every module `machine.js` imports: `engine-ed1.js`, `engine-ed2.js`,
+`tables-ed1.js`, `tables-ed2.js`, `log1p.js`, `audio.js`, plus the CSS
+(the working copy, `engine.js` with `tables.js`, stays here until it is
+released). The
 shell is the site's own file (`website_handoff/` is gitignored here).
 Workflow: edit HERE first → verify → `cp` the changed files into a branch of
 dash_website → PR (Vercel preview + SonarCloud run; the vendored dir is

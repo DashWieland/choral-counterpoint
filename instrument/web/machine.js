@@ -7,17 +7,19 @@
 // No. N from seed N — within an edition, the same piece for everyone, forever.
 
 import { composePiece as composeEd1 } from './engine-ed1.js';
-import { composePiece as composeNext } from './engine.js';
+import { composePiece as composeEd2 } from './engine-ed2.js';
 import { Choir } from './audio.js';
 
 // Editions. Each is a promise that No. N plays one piece forever. Edition 1
-// is frozen in engine-ed1.js; engine.js is the working copy of the next.
-// A ?piece= link without ?ed= is an Edition 1 link (every link shared before
-// editions existed); a visit with no address starts on the current edition.
-// Only released editions are reachable by URL; opts.edition can preview one.
-export const EDITIONS = { 1: composeEd1, 2: composeNext };
-export const RELEASED = 1;          // the highest edition a URL may open
-export const CURRENT = 1;           // the edition a fresh visit plays
+// is frozen in engine-ed1.js and Edition 2 (bar form) in engine-ed2.js;
+// engine.js is the working copy of the next. A ?piece= link without ?ed= is
+// an Edition 1 link (every link shared before editions existed); a visit
+// with no address starts on the current edition. Only released editions are
+// reachable by URL; opts.edition can preview one. To hear the working copy,
+// import engine.js as edition 3 here and raise RELEASED locally.
+export const EDITIONS = { 1: composeEd1, 2: composeEd2 };
+export const RELEASED = 2;          // the highest edition a URL may open
+export const CURRENT = 2;           // the edition a fresh visit plays
 
 export function editionOf(params, released = RELEASED, current = CURRENT) {
   const s = String(params.get('ed') ?? '').trim();
