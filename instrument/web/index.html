@@ -22,6 +22,14 @@
   --color-danger:         #8b2e2e;
   --font-display: 'Playfair Display', serif;
   --font-body: 'IBM Plex Mono', monospace;
+  /* tokens hurdy-gurdy.css reads, named as on apophenia.blog so the site's
+     copy of the CSS and this one stay identical */
+  --color-signal-ink:  var(--color-signal);
+  --type-label-family: var(--font-body);
+  --type-label-size:   0.875rem;
+  --type-label-case:   uppercase;
+  --type-meta-family:  var(--font-body);
+  --type-meta-size:    0.9375rem;
 }
 [data-theme="candlelight"] {
   --color-bg:             #f5edd8;
@@ -77,7 +85,7 @@ body {
   everyone who finds it; the unheard music is further out.</p>
 </div>
 <script type="module">
-import { mountHurdyGurdy } from './machine.js?v=9';
+import { mountHurdyGurdy } from './machine.js?v=10';
 mountHurdyGurdy(document.getElementById('machine'));
 </script>
 </body>
