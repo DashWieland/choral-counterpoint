@@ -1,0 +1,56 @@
+Soprano lines of the listening examples (skeleton: one note per chord, before ornaments).
+shipped = the live engine, composePiece(N), what ?piece=N plays today.
+barform = the lab engine with the Edition 2 fix flags and the bar-form planner (review/lab/barform.mjs).
+Letters mark identical phrases; each line ends at a fermata. MIDI at 72 bpm, fermatas held double.
+
+No. 1  shipped  Eb major, 18 chords, 4 phrases, form A B C D, kept at draft 2, 0 warnings
+  A  Eb5 Ab5 G5 F5
+  B  Eb5 Eb5 F5 G5
+  C  D5 Eb5 D5 Eb5 C5 Bb4
+  D  Eb5 Eb5 F5 Eb5
+
+No. 1  barform  Eb major, 49 chords, 7 phrases, form A B A B C D E, meter 7, authentic ambitus, climax Eb5 at chord 32, kept at draft 1 (bass line 1), 2 warnings
+  A  Eb4 F4 G4 Eb4 G4 F4 F4
+  B  G4 C5 C5 Ab4 Bb4 Ab4 G4
+  A  Eb4 F4 G4 Eb4 G4 F4 F4
+  B  G4 C5 C5 Ab4 Bb4 Ab4 G4
+  C  G4 D5 D5 Eb5 C5 B4 C5
+  D  Bb4 Bb4 Ab4 F4 G4 F4 F4
+  E  G4 Ab4 Bb4 Ab4 G4 F4 Eb4
+  Stollen repeat harmonized differently at 7 of 14 chords (1, 9, 10, 11, 12, 13, 14)
+
+No. 2  shipped  F minor, 8 chords, 2 phrases, form A B, kept at draft 1, 2 warnings
+  A  C4 Bb3 Bb3 C4
+  B  F4 G4 G4 F4
+
+No. 2  barform  F minor, 32 chords, 4 phrases, form A A B C, meter 8, authentic ambitus, climax G5 at chord 21, kept at draft 1 (bass line 1), 0 warnings
+  A  F4 Ab4 Ab4 G4 Ab4 Bb4 Ab4 G4
+  A  F4 Ab4 Ab4 G4 Ab4 Bb4 Ab4 G4
+  B  Ab4 Bb4 C5 F5 G5 F5 F5 Eb5
+  C  F5 Eb5 Db5 C5 Bb4 Ab4 G4 F4
+  Stollen repeat harmonized differently at 2 of 8 chords (1, 3)
+
+No. 3  shipped  F minor, 13 chords, 3 phrases, form A B C, kept at draft 2, 0 warnings
+  A  C5 Bb4 Ab4 G4
+  B  F4 G4 G4 Ab4 G4
+  C  Ab4 Ab4 G4 F4
+
+No. 3  barform  F minor, 42 chords, 6 phrases, form A B A B C D, meter 7, authentic ambitus, climax F5 at chord 32, kept at draft 1 (bass line 1), 2 warnings
+  A  F4 G4 Ab4 Bb4 Bb4 C5 Ab4
+  B  Ab4 Bb4 Ab4 Ab4 F4 G4 F4
+  A  F4 G4 Ab4 Bb4 Bb4 C5 Ab4
+  B  Ab4 Bb4 Ab4 Ab4 F4 G4 F4
+  C  Ab4 C5 Db5 F5 Eb5 Db5 C5
+  D  C5 Bb4 C5 Ab4 Ab4 G4 F4
+  Stollen repeat harmonized differently at 13 of 14 chords (1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14)
+
+No. 4  shipped  F minor, 11 chords, 2 phrases, form A B, kept at draft 1, 1 warnings
+  A  F4 G4 G4 F4 G4
+  B  Ab4 Bb4 G4 Ab4 G4 F4
+
+No. 4  barform  F minor, 31 chords, 4 phrases, form A A B C, meter 8.7, authentic ambitus, climax F5 at chord 21, kept at draft 1 (bass line 1), 0 warnings
+  A  C5 C5 Bb4 Ab4 F4 Ab4 G4 Ab4
+  A  C5 C5 Bb4 Ab4 F4 Ab4 G4 Ab4
+  B  G4 Ab4 Eb5 Eb5 F5 Eb5 D5 Eb5
+  C  C5 Bb4 Bb4 Ab4 G4 G4 F4
+  Stollen repeat harmonized differently at 8 of 8 chords (1, 2, 3, 4, 5, 6, 7, 8)
