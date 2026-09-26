@@ -243,11 +243,29 @@ const ivBucket = iv => iv === 0 ? 'rep'
 function melody(tonicPc, mode, nPhrases, rng) {
   const scale = new Set([...(mode === 'major' ? [0, 2, 4, 5, 7, 9, 11]
                                               : [0, 2, 3, 5, 7, 8, 10])].map(d => mod12(tonicPc + d)));
-  const tonic4 = 60 + tonicPc;
+  // one soprano band for every key (Edition 1 anchored it at the tonic above
+  // middle C, which put C and D tunes on the floor of the range)
   const window = [];
-  for (let m = Math.max(60, tonic4 - 5); m < Math.min(79, tonic4 + 14); m++)
+  for (let m = 62; m < 79; m++)
     if (scale.has(mod12(m))) window.push(m);
   const deg = m => mod12(m - tonicPc);
+  // a cadence formula is placed as a unit, every note inside the soprano
+  // range (Edition 1 placed it note by note above MIDI 58 and repeated the
+  // last note when it couldn't, stranding tunes before their final tonic)
+  const placeFormula = (start, formula) => {
+    const out = [start];
+    for (let j = 1; j < formula.length; j++) {
+      const prev = out[out.length - 1];
+      let best = null;
+      for (let m = prev - 6; m <= prev + 6; m++)
+        if (mod12(m - tonicPc) === formula[j] &&
+            (best === null || Math.abs(m - prev) <= Math.abs(best - prev))) best = m;
+      out.push(best);
+    }
+    return out.every(m => m >= 60 && m <= 81) ? out : null;
+  };
+  const RANGE = [];
+  for (let m = 60; m <= 81; m++) RANGE.push(m);
   const interTargets = mode === 'major' ? [2, 7, 4] : [2, 7, 3];
   const plan = [];
   for (let i = 0; i < nPhrases - 1; i++) plan.push(choice(rng, interTargets));
@@ -290,15 +308,38 @@ function melody(tonicPc, mode, nPhrases, rng) {
         if (back.length) cands = back;
       }
       const goalDeg = formula ? formula[0] : targetDeg;
-      const tgt = window.filter(m => deg(m) === goalDeg);
+      // steer toward where the formula can really start, including a raised
+      // seventh that the natural-minor window leaves out
+      const tgt = formula
+        ? RANGE.filter(m => deg(m) === goalDeg && placeFormula(m, formula))
+        : window.filter(m => deg(m) === goalDeg);
       const goal = tgt.length
         ? tgt.reduce((a, b) => Math.abs(a - prev) < Math.abs(b - prev) ? a : b) : prev;
       if (stepsLeft <= 3) {
         const near = cands.filter(m => Math.abs(m - goal) <= 2 * (stepsLeft - 1) + 2);
         if (near.length) cands = near;
       }
+      if (formula && stepsLeft === 1) {
+        // never enter the formula by a tritone or an augmented second
+        const entry = m => {
+          let best = null;
+          for (let x = m - 6; x <= m + 6; x++)
+            if (mod12(x - tonicPc) === formula[0] &&
+                (best === null || Math.abs(x - m) <= Math.abs(best - m))) best = x;
+          return best;
+        };
+        const ok = cands.filter(m => {
+          const e = entry(m), d = Math.abs(e - m);
+          const aug2 = d === 3 && mode === 'minor' &&
+            new Set([deg(m), mod12(e - tonicPc)]).has(8) && new Set([deg(m), mod12(e - tonicPc)]).has(11);
+          return d !== 6 && !aug2;
+        });
+        if (ok.length) cands = ok;
+      }
       if (!cands.length)
         cands = window.filter(m => Math.abs(m - prev) > 0 && Math.abs(m - prev) <= 4);
+      if (!cands.length)             // Edition 1 pushed undefined here
+        cands = [window.reduce((a, b) => Math.abs(a - prev) <= Math.abs(b - prev) ? a : b)];
       const prevIv = pitches.length >= 2
         ? pitches[pitches.length - 1] - pitches[pitches.length - 2] : 0;
       const frac = (k + 1) / Math.max(plen, 1);
@@ -313,7 +354,41 @@ function melody(tonicPc, mode, nPhrases, rng) {
       });
       pitches.push(weightedChoice(rng, cands, weights));
     }
+    let placed = null;
     if (formula) {
+      const prev = pitches[pitches.length - 1];
+      // nearest start of formula f within `span` that fits the range and
+      // doesn't enter by a forbidden leap
+      const startFor = (f, span, forbid) => {
+        let best = null;
+        for (let m = prev - span; m <= prev + span; m++) {
+          if (mod12(m - tonicPc) !== f[0] || !placeFormula(m, f)) continue;
+          if (forbid.includes(Math.abs(m - prev))) continue;
+          if (best === null || Math.abs(m - prev) <= Math.abs(best - prev)) best = m;
+        }
+        return best;
+      };
+      const near = [6];                           // never a tritone into a cadence
+      const far = [6, 10, 11];                    // nor a seventh
+      let f = formula, best = startFor(f, 7, near);
+      if (best === null) best = startFor(f, 12, far);
+      if (best === null) {
+        // the drawn formula can't be reached: Bach's other formulas for the
+        // same cadence, most common first (no rng, so the stream is unchanged)
+        const pool = Object.entries(MELODY.cadences[mode] || {})
+          .map(([k, c]) => [k.split(',').map(Number), c])
+          .filter(([d, c]) => d[2] === targetDeg && c >= 5)
+          .sort((x, y) => y[1] - x[1]);
+        for (const [g] of pool) {
+          const s = startFor(g, 7, near) ?? startFor(g, 12, far);
+          if (s !== null) { f = g; best = s; break; }
+        }
+      }
+      if (best !== null) placed = placeFormula(best, f);
+    }
+    if (placed) {
+      pitches.push(...placed);
+    } else if (formula) {
       for (const fdeg of formula) {
         const prev = pitches[pitches.length - 1];
         const opts = [];
@@ -393,6 +468,16 @@ function bassLine(sop, fermatas, tonicPc, mode, rng, beamWidth = 10, temp = 0) {
           else if (dm === 0 || ds === 0) s += 0.2;
           const a = Math.abs(dm);
           if (a === 10 || a === 11) continue;
+          // what the inner-voice search and the checker would reject anyway,
+          // refused here where the notes are written (checked after the
+          // random draw so the stream matches the review's lab)
+          if (pairParallel(sop[i - 1], prev, sop[i], cand)) continue;   // the sixth pair
+          if (i === n - 1 && mod12(cand) !== tonicPc) continue;        // end on the tonic
+          if (sop[i] - cand <= 3) continue;           // leave room for alto and tenor
+          if (mode === 'minor' && a === 3 && !ferm.has(i)) {
+            const r2 = new Set([rel(prev), tPc]);
+            if (r2.has(8) && r2.has(11)) continue;                     // augmented second
+          }
           if (a === 6) s -= 1.0;
           s += (a === 1 || a === 2) ? 0.5 : a <= 4 ? 0.2 : a <= 7 ? 0.05 : -0.5;
           if (!scale.has(tPc) && a === 3) s -= 2.0;
@@ -492,11 +577,19 @@ function harmonize(sop, bass, fermatas, tonicPc, mode, beamWidth = 14) {
         for (let x = 0; x < 4 && !bad; x++)
           for (let y = x + 1; y < 4; y++)
             if (pairParallel(qp[x], qp[y], qc[x], qc[y])) { bad = true; break; }
-        if (!bad && mode === 'minor' && !fermSet.has(i)) {
+        if (!bad) {
+          // one rule for the inner voices, fermatas included (the surface
+          // gate has no fermata exemption, so Edition 1 wrote leaps here
+          // that its own gate then rejected): no leap of a seventh or more
+          // than an octave, and no augmented second (b6/#7, or a chromatic
+          // end, as compose.py's harmonize has always required)
           for (const [pp, cp] of [[pa, a], [pt, t]]) {
-            if (Math.abs(cp - pp) === 3) {
-              const rel2 = new Set([mod12(pp - tonicPc), mod12(cp - tonicPc)]);
-              if (rel2.has(8) && rel2.has(11)) bad = true;
+            const d = Math.abs(cp - pp);
+            if (d === 10 || d === 11 || d > 12) bad = true;
+            if (d === 3) {
+              const r1 = mod12(pp - tonicPc), r2 = mod12(cp - tonicPc);
+              if ((r1 === 8 && r2 === 11) || (r1 === 11 && r2 === 8) ||
+                  !scale.has(r1) || !scale.has(r2)) bad = true;
             }
           }
         }
@@ -646,15 +739,33 @@ const KEYS = [
   ['C', 0], ['D', 2], ['Eb', 3], ['F', 5], ['G', 7], ['A', 9], ['Bb', 10],
 ];
 
+// Seeds are an integer hash of the address (splitmix64 over BigInt), exact
+// for every address up to 2^53 and with no structure. Edition 1 used
+// n*2654435761 and n*1000 + 7a + 13 in floating point: its compose streams
+// repeated every 2^29 addresses (No. 536,870,922 is No. 10 again), its key
+// choice lost precision past No. 3,393,263, and near the top every piece was
+// D minor and some addresses could not compose at all.
+const M64 = (1n << 64n) - 1n;
+function splitmix64(x) {
+  x = (x + 0x9E3779B97F4A7C15n) & M64;
+  let z = x;
+  z = ((z ^ (z >> 30n)) * 0xBF58476D1CE4E5B9n) & M64;
+  z = ((z ^ (z >> 27n)) * 0x94D049BB133111EBn) & M64;
+  return z ^ (z >> 31n);
+}
+// stream 0 picks key, mode and phrase count; stream 1 + a drives draft a
+const seedOf = (n, stream) =>
+  Number(splitmix64(BigInt(Math.floor(n)) * 64n + BigInt(stream)) & 0xFFFFFFFFn);
+
 // composePiece(n): the plate number is the seed. Deterministic forever.
 export function composePiece(pieceNumber, density = 1.0) {
-  const paramRng = mulberry32(pieceNumber * 2654435761 + 1);
+  const paramRng = mulberry32(seedOf(pieceNumber, 0));
   const [tonicName, tonicPc] = choice(paramRng, KEYS);
   const mode = paramRng() < 0.45 ? 'minor' : 'major';
   const phrases = choice(paramRng, [2, 3, 3, 4]);
 
   for (let attempt = 0; attempt < 40; attempt++) {
-    const rng = mulberry32(pieceNumber * 1000 + attempt * 7 + 13);
+    const rng = mulberry32(seedOf(pieceNumber, attempt + 1));
     const { pitches: sop, fermatas } = melody(tonicPc, mode, phrases, rng);
     const bass = bassLine(sop, fermatas, tonicPc, mode, rng, 10, 0.15 * attempt);
     if (!bass) continue;

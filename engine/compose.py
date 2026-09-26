@@ -55,10 +55,25 @@ def scale_pcs(tonic_pc, mode):
 def melody(tonic_pc, mode, n_phrases, rng):
     """Phrase-planned soprano in slot format. Returns (pitches, fermatas)."""
     scale = scale_pcs(tonic_pc, mode)
-    tonic4 = 60 + tonic_pc                            # tonic in the C4..B4 octave
-    window = [m for m in range(max(60, tonic4 - 5), min(79, tonic4 + 14))
-              if m % 12 in scale]
+    # one soprano band for every key (anchoring it at the tonic above middle
+    # C put C and D tunes on the floor of the range and crushed the inner voices)
+    window = [m for m in range(62, 79) if m % 12 in scale]
     deg = lambda m: (m % 12 - tonic_pc) % 12
+
+    def nearest(opts, x):
+        """The option nearest x; ties go to the higher note, as in the JS port."""
+        return min(opts, key=lambda m: (abs(m - x), -m))
+
+    def place_formula(start, formula):
+        """The formula placed from `start`, each note nearest the one before,
+        or None if any note leaves the soprano range (C4-A5)."""
+        out = [start]
+        for fdeg in formula[1:]:
+            prev = out[-1]
+            out.append(nearest([m for m in range(prev - 6, prev + 7)
+                                if (m - tonic_pc) % 12 == fdeg], prev))
+        return out if all(60 <= m <= 81 for m in out) else None
+
     inter_targets = [2, 7, 4] if mode == 'major' else [2, 7, 3]
     plan = [rng.choice(inter_targets) for _ in range(n_phrases - 1)] + [0]
     phrase_lens = [rng.choice([4, 5, 6]) for _ in range(n_phrases)]
@@ -66,10 +81,13 @@ def melody(tonic_pc, mode, n_phrases, rng):
     climax_pos = int(total * rng.uniform(0.55, 0.75))
 
     # cadence formulas: Bach's actual last-three-degree shapes, by frequency
-    def pick_formula(target_deg):
-        pool = [(tuple(int(x) for x in k.split(',')), c)
+    def formula_pool(target_deg):
+        return [(tuple(int(x) for x in k.split(',')), c)
                 for k, c in MELODY['cadences'].get(mode, {}).items()
                 if int(k.split(',')[-1]) == target_deg and c >= 5]
+
+    def pick_formula(target_deg):
+        pool = formula_pool(target_deg)
         if not pool:
             return None
         ks, ws = zip(*pool)
@@ -81,7 +99,7 @@ def melody(tonic_pc, mode, n_phrases, rng):
     for pi, (plen, target_deg) in enumerate(zip(phrase_lens, plan)):
         formula = pick_formula(target_deg) if plen >= 4 else None
         free = plen - (3 if formula else 1)
-        for k in range(free if pitches or not formula else free):
+        for k in range(free):
             pos = len(pitches)
             if pos == 0:
                 pitches.append(cur)
@@ -94,20 +112,32 @@ def melody(tonic_pc, mode, n_phrases, rng):
                 back = [m for m in cands if abs(m - prev) <= 2
                         and (m - prev) * (prev - pitches[-2]) < 0]
                 cands = back or cands
-            # drift toward where the cadence formula will begin
+            # drift toward where the cadence formula can really begin,
+            # including a raised seventh the natural-minor window leaves out
             goal_deg = formula[0] if formula else target_deg
-            tgt = [m for m in window if deg(m) == goal_deg]
+            if formula:
+                tgt = [m for m in range(60, 82)
+                       if deg(m) == goal_deg and place_formula(m, formula)]
+            else:
+                tgt = [m for m in window if deg(m) == goal_deg]
             goal = min(tgt, key=lambda m: abs(m - prev)) if tgt else prev
             if steps_left <= 3:
                 cands = [m for m in cands
                          if abs(m - goal) <= 2 * (steps_left - 1) + 2] or cands
+            if formula and steps_left == 1:
+                # never enter the formula by a tritone or an augmented second
+                def enters_well(m):
+                    e = nearest([x for x in range(m - 6, m + 7)
+                                 if (x - tonic_pc) % 12 == formula[0]], m)
+                    d = abs(e - m)
+                    aug2 = d == 3 and mode == 'minor' and \
+                        {deg(m), (e - tonic_pc) % 12} == {8, 11}
+                    return d != 6 and not aug2
+                cands = [m for m in cands if enters_well(m)] or cands
             if not cands:
                 cands = [m for m in window if 0 < abs(m - prev) <= 4]
             if not cands:
-                # a cadence formula climbed out of the window and no note is
-                # within reach: discard this melody and let compose() draw
-                # again (the JS port lets it die in the bass search instead)
-                return None, None
+                cands = [nearest(window, prev)]
             prev_iv = pitches[-1] - pitches[-2] if len(pitches) >= 2 else 0
             frac = (k + 1) / max(plen, 1)
             posb = 'early' if frac < 0.4 else 'mid' if frac < 0.8 else 'late'
@@ -121,7 +151,36 @@ def melody(tonic_pc, mode, n_phrases, rng):
                     w *= 0.35
                 weights.append(w)
             pitches.append(rng.choices(cands, weights)[0])
+        placed = None
         if formula:
+            # the formula is placed as a unit inside the soprano range; if the
+            # drawn one can't be reached, try Bach's other formulas for the
+            # same cadence, most common first
+            prev = pitches[-1]
+
+            def start_for(f, span, forbid):
+                starts = [m for m in range(prev - span, prev + span + 1)
+                          if (m - tonic_pc) % 12 == f[0]
+                          and abs(m - prev) not in forbid and place_formula(m, f)]
+                return nearest(starts, prev) if starts else None
+
+            near, far = (6,), (6, 10, 11)     # never a tritone (nor a 7th) into a cadence
+            f, best = formula, start_for(formula, 7, near)
+            if best is None:
+                best = start_for(f, 12, far)
+            if best is None:
+                for g, _ in sorted(formula_pool(target_deg), key=lambda kc: -kc[1]):
+                    s = start_for(list(g), 7, near)
+                    if s is None:
+                        s = start_for(list(g), 12, far)
+                    if s is not None:
+                        f, best = list(g), s
+                        break
+            if best is not None:
+                placed = place_formula(best, f)
+        if placed:
+            pitches.extend(placed)
+        elif formula:
             for fdeg in formula:
                 prev = pitches[-1]
                 opts = [m for m in range(prev - 6, prev + 7)
@@ -196,6 +255,17 @@ def bass_line(sop, fermatas, tonic_pc, mode, rng, beam_width=10, temp=0.0):
                     a = abs(dm)
                     if a in (10, 11):
                         continue                       # seventh leap: checker kills it
+                    # what the inner-voice search and the checker would
+                    # reject later, refused where the notes are written
+                    if pair_parallel(sop[i-1], prev, sop[i], cand):
+                        continue                       # the sixth pair
+                    if i == n - 1 and cand % 12 != tonic_pc:
+                        continue                       # end on the tonic
+                    if sop[i] - cand <= 3:
+                        continue                       # room for alto and tenor
+                    if mode == 'minor' and a == 3 and i not in ferm \
+                            and {rel(prev), t_pc} == {8, 11}:
+                        continue                       # augmented second
                     if a == 6:
                         s -= 1.0                       # tritone leap: warning tier
                     s += 0.5 if a in (1, 2) else (0.2 if a <= 4 else
@@ -316,6 +386,8 @@ def harmonize(sop, bass, fermatas, tonic_pc, mode, beam_width=14):
                 if not bad:
                     for prev_p, cur_p in ((pa, a), (pt, t)):
                         step = abs(cur_p - prev_p)
+                        if step in (10, 11) or step > 12:
+                            bad = True                 # the checker's leap rules, everywhere
                         if step == 3:
                             pcs2 = {prev_p % 12, cur_p % 12}
                             # augmented second: any 3-semitone move where one
