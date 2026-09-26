@@ -1,14 +1,17 @@
+// EDITION 1, FROZEN. This is the engine every ?piece=N link without ?ed=
+// plays, byte for byte as it shipped (with its own frozen tables-ed1.js).
+// Never edit it: golden.mjs checks pieces 1..20,000 against golden-ed1.json.
+// New work goes in engine.js, which becomes the next edition.
+//
 // The composition engine, ported from the auto_compose Python engine.
 // Composes a verified four-voice chorale from a seed in ~milliseconds:
 // melody planner -> bass beam search over the outer-voice oracle ->
 // inner-voice beam search under the voice-leading laws -> checker gate ->
 // corpus-rate ornamentation (with its own surface checker as the gate).
-//
-// This file is the WORKING COPY of the next edition. Released editions are
-// frozen in their own files (engine-ed1.js) and machine.js maps ?ed= to
-// them; within an edition, piece N is the same piece for everyone, forever.
+// Deterministic: piece N is the same piece for everyone, forever
+// (golden.mjs guards it; log1p.js keeps it true in every browser).
 
-import { TABLES } from './tables.js';
+import { TABLES } from './tables-ed1.js';
 import { log1p } from './log1p.js';
 
 const ORACLE = TABLES.outer_voice_table;
