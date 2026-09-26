@@ -2,12 +2,12 @@
 // compose pieces No. 1..200, demand every one violation-free and in bar form
 // (the Stollen sung twice note for note, ornaments included; phrases of a
 // hymn meter's 6 to 8 notes; one climax; the plate's count right), report stats.
-// Then check that frozen Edition 1 (engine-ed1.js) still plays its pieces
-// 1..200 (golden-ed1.json; golden.mjs checks 20,000), and say whether
-// engine.js still plays Edition 1's pieces.
+// Then check that every frozen edition (engine-ed1.js, engine-ed2.js) still
+// plays its pieces 1..200 (golden-edN.json; golden.mjs checks 20,000), and
+// say whether engine.js still plays the latest edition's pieces.
 import { readFileSync } from 'node:fs';
 import { composePiece, checkChorale } from './engine.js';
-import { digestOf, digestOfDigests, rangeDigest } from './golden.mjs';
+import { FROZEN, digestOf, digestOfDigests, rangeDigest } from './golden.mjs';
 
 const t0 = Date.now();
 let ok = 0, failed = 0, chrom = 0, warnings = 0, ornaments = 0, slots = 0;
@@ -84,9 +84,12 @@ const top = Object.entries(intervals).sort((a,b)=>b[1]-a[1]).slice(0,5)
 console.log(`soprano intervals: ${top}`);
 console.log('keys:', Object.entries(keys).map(([k,c])=>`${k}×${c}`).join(' '));
 
-const golden = JSON.parse(readFileSync(new URL('./golden-ed1.json', import.meta.url), 'utf8'));
-if (rangeDigest(1, 200) === golden.first200) console.log('Edition 1 (engine-ed1.js): pieces 1..200 unchanged');
-else { console.log('EDITION 1 CHANGED: pieces 1..200 differ from golden-ed1.json'); process.exitCode = 1; }
-console.log(digestOfDigests(digests) === golden.first200
-  ? 'engine.js still plays Edition 1 (pieces 1..200)'
-  : 'engine.js plays different pieces from Edition 1 (expected once the next edition diverges)');
+const golden = ed => JSON.parse(readFileSync(new URL(`./golden-ed${ed}.json`, import.meta.url), 'utf8'));
+const editions = Object.keys(FROZEN).map(Number), latest = Math.max(...editions);
+for (const ed of editions) {
+  if (rangeDigest(1, 200, ed) === golden(ed).first200) console.log(`Edition ${ed} (engine-ed${ed}.js): pieces 1..200 unchanged`);
+  else { console.log(`EDITION ${ed} CHANGED: pieces 1..200 differ from golden-ed${ed}.json`); process.exitCode = 1; }
+}
+console.log(digestOfDigests(digests) === golden(latest).first200
+  ? `engine.js still plays Edition ${latest} (pieces 1..200)`
+  : `engine.js plays different pieces from Edition ${latest} (expected once the next edition diverges)`);

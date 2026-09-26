@@ -5,7 +5,8 @@
 // ed-less ?piece= link is Edition 1 forever, a fresh visit plays the current
 // edition, and only released editions open from a URL.
 import { composePiece } from './engine-ed1.js';
-import { openAddress, pieceOrNext, editionOf, EDITIONS } from './machine.js';
+import { composePiece as composeEd2 } from './engine-ed2.js';
+import { openAddress, pieceOrNext, editionOf, EDITIONS, RELEASED, CURRENT } from './machine.js';
 
 const LAST = Number.MAX_SAFE_INTEGER;
 let checks = 0, failed = 0;
@@ -46,6 +47,14 @@ expect('?ed=2 alone (released 2)', ed('?ed=2', 2, 2), 2);
 for (const junk of ['0', '3', 'two', '1.5', '-1'])
   expect(`?piece=5&ed=${junk}`, ed(`?piece=5&ed=${junk}`, 2, 2), 1);
 expect('Edition 1 is the frozen engine', EDITIONS[1], composePiece);
+expect('Edition 2 is the frozen engine', EDITIONS[2], composeEd2);
+// as released: Edition 2 is current, and every ed-less link stays Edition 1
+expect('released', RELEASED, 2);
+expect('current', CURRENT, 2);
+expect('a fresh visit plays Edition 2', editionOf(new URLSearchParams('')), 2);
+expect('an ed-less ?piece= link is Edition 1', editionOf(new URLSearchParams('?piece=12')), 1);
+expect('?piece=12&ed=2 opens Edition 2', editionOf(new URLSearchParams('?piece=12&ed=2')), 2);
+expect('?piece=12&ed=3 is not released', editionOf(new URLSearchParams('?piece=12&ed=3')), 1);
 expect('the machine defaults to Edition 1', openAddress('42').piece.key,
   openAddress('42', EDITIONS[1]).piece.key);
 
