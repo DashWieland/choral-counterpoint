@@ -103,6 +103,11 @@ def melody(tonic_pc, mode, n_phrases, rng):
                          if abs(m - goal) <= 2 * (steps_left - 1) + 2] or cands
             if not cands:
                 cands = [m for m in window if 0 < abs(m - prev) <= 4]
+            if not cands:
+                # a cadence formula climbed out of the window and no note is
+                # within reach: discard this melody and let compose() draw
+                # again (the JS port lets it die in the bass search instead)
+                return None, None
             prev_iv = pitches[-1] - pitches[-2] if len(pitches) >= 2 else 0
             frac = (k + 1) / max(plen, 1)
             posb = 'early' if frac < 0.4 else 'mid' if frac < 0.8 else 'late'
@@ -383,6 +388,8 @@ def compose(tonic='D', mode='minor', phrases=3, seed=7, density=1.0, plain=False
             ferm = list(given_melody.get('fermatas', [len(sop)]))
         else:
             sop, ferm = melody(tonic_pc, mode, phrases, rng)
+            if sop is None:
+                continue
         bass = bass_line(sop, ferm, tonic_pc, mode, rng, temp=0.15 * attempt)
         if bass is None:
             continue
