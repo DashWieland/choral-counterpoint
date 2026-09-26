@@ -216,6 +216,7 @@ export function mountHurdyGurdy(container, opts = {}) {
     plateInfo.textContent = `${p.key.toUpperCase()} · ${p.phrases} PHRASES` +
       (edition === 1 ? '' : ` · ED. ${edition}`);
     const bytes = midiBytes(p);
+    if (exportA.href.startsWith('blob:')) URL.revokeObjectURL(exportA.href);   // one blob, not one per piece
     exportA.href = URL.createObjectURL(new Blob([bytes], { type: 'audio/midi' }));
     exportA.download = `chorale-${String(n).padStart(4, '0')}` +
       (edition === 1 ? '' : `-ed${edition}`) + '.mid';
@@ -481,6 +482,7 @@ export function mountHurdyGurdy(container, opts = {}) {
     themeObserver.disconnect();
     if (choir) { choir.releaseAll(0.05); sounding.clear(); }
     if (audioCtx) audioCtx.close();
+    if (exportA.href.startsWith('blob:')) URL.revokeObjectURL(exportA.href);
     container.innerHTML = '';
   };
 }
