@@ -1,7 +1,8 @@
 // Edition 1 golden test: piece No. N must never change (?piece=N links exist
-// in the wild). golden-ed1.json holds SHA-256 digests of composePiece(n) for
-// pieces 1..10 one by one, pieces 1..200 as one digest (test_engine.mjs checks
-// that on every run), and 1..20,000 in blocks of 1,000.
+// in the wild). golden-ed1.json holds SHA-256 digests of Edition 1's
+// composePiece(n) (engine-ed1.js, frozen) for pieces 1..10 one by one,
+// pieces 1..200 as one digest (test_engine.mjs checks that on every run),
+// and 1..20,000 in blocks of 1,000.
 //
 //   node golden.mjs             check all 20,000 (a few minutes)
 //   node golden.mjs 2000        check only the blocks inside 1..2,000
@@ -10,7 +11,7 @@
 // A failing block names its range; bisect it with pieceDigest(n).
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { composePiece } from './engine.js';
+import { composePiece } from './engine-ed1.js';
 
 const FILE = new URL('./golden-ed1.json', import.meta.url);
 const BLOCK = 1000, TOTAL = 20000;

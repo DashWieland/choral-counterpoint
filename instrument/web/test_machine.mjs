@@ -1,9 +1,11 @@
 // The machine's address contract: ?piece=N opens No. N anywhere on the
 // shelf (1 .. MAX_SAFE_INTEGER), junk opens No. 1, past the end opens the
 // last piece, and every search past null chorales returns. (Before the
-// bound, the stuck-float addresses below froze the tab.)
-import { composePiece } from './engine.js';
-import { openAddress, pieceOrNext } from './machine.js';
+// bound, the stuck-float addresses below froze the tab.) Then editions: an
+// ed-less ?piece= link is Edition 1 forever, a fresh visit plays the current
+// edition, and only released editions open from a URL.
+import { composePiece } from './engine-ed1.js';
+import { openAddress, pieceOrNext, editionOf, EDITIONS } from './machine.js';
 
 const LAST = Number.MAX_SAFE_INTEGER;
 let checks = 0, failed = 0;
@@ -32,5 +34,20 @@ expect('backward past a null', pieceOrNext(nul, -1).number < nul, true);
 expect('past the last piece', pieceOrNext(LAST + 1), null);
 expect('before No. 1', pieceOrNext(0, -1), null);
 
-console.log(failed ? `\n${failed}/${checks} FAILED` : `address contract holds (${checks} checks)`);
+// editions
+const ed = (q, released, current) => editionOf(new URLSearchParams(q), released, current);
+expect('?piece=12 (released 1)', ed('?piece=12', 1, 1), 1);
+expect('?piece=12 (released 2)', ed('?piece=12', 2, 2), 1);
+expect('fresh visit (current 1)', ed('', 1, 1), 1);
+expect('fresh visit (current 2)', ed('', 2, 2), 2);
+expect('?piece=12&ed=2 (released 1)', ed('?piece=12&ed=2', 1, 1), 1);
+expect('?piece=12&ed=2 (released 2)', ed('?piece=12&ed=2', 2, 2), 2);
+expect('?ed=2 alone (released 2)', ed('?ed=2', 2, 2), 2);
+for (const junk of ['0', '3', 'two', '1.5', '-1'])
+  expect(`?piece=5&ed=${junk}`, ed(`?piece=5&ed=${junk}`, 2, 2), 1);
+expect('Edition 1 is the frozen engine', EDITIONS[1], composePiece);
+expect('the machine defaults to Edition 1', openAddress('42').piece.key,
+  openAddress('42', EDITIONS[1]).piece.key);
+
+console.log(failed ? `\n${failed}/${checks} FAILED` : `address contract and editions hold (${checks} checks)`);
 process.exitCode = failed ? 1 : 0;

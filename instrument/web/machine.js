@@ -4,10 +4,26 @@
 // The master clock is tape position (in eighths). The crank's angular
 // velocity sets how fast position advances; notes start and stop as the
 // playhead crosses them, in either direction. The engine composes piece
-// No. N from seed N — same piece for everyone, forever.
+// No. N from seed N — within an edition, the same piece for everyone, forever.
 
-import { composePiece } from './engine.js';
+import { composePiece as composeEd1 } from './engine-ed1.js';
+import { composePiece as composeNext } from './engine.js';
 import { Choir } from './audio.js';
+
+// Editions. Each is a promise that No. N plays one piece forever. Edition 1
+// is frozen in engine-ed1.js; engine.js is the working copy of the next.
+// A ?piece= link without ?ed= is an Edition 1 link (every link shared before
+// editions existed); a visit with no address starts on the current edition.
+// Only released editions are reachable by URL; opts.edition can preview one.
+export const EDITIONS = { 1: composeEd1, 2: composeNext };
+export const RELEASED = 1;          // the highest edition a URL may open
+export const CURRENT = 1;           // the edition a fresh visit plays
+
+export function editionOf(params, released = RELEASED, current = CURRENT) {
+  const s = String(params.get('ed') ?? '').trim();
+  if (/^\d+$/.test(s) && Number(s) >= 1 && Number(s) <= released) return Number(s);
+  return params.get('piece') ? 1 : current;
+}
 
 const EW = 26;                 // px per eighth at design scale
 const MOTOR_BPM = 66;
@@ -28,10 +44,10 @@ function perfTotalOf(p) {
 // Null chorales appear past ~1e15 and reach ~4% near the top of the shelf,
 // never more than 3 in a row in a 6,000-piece scan there; the search stays
 // on the shelf and gives up after MAX_NULL_RUN, so it always returns.
-export function pieceOrNext(n, dir = 1) {
+export function pieceOrNext(n, dir = 1, compose = composeEd1) {
   for (let k = n, tries = 0; tries < MAX_NULL_RUN; k += dir, tries++) {
     if (k < 1 || k > LAST_PIECE) return null;       // off the end of the shelf
-    const p = composePiece(k);
+    const p = compose(k);
     if (p) return { piece: p, number: k };
   }
   return null;
@@ -40,10 +56,10 @@ export function pieceOrNext(n, dir = 1) {
 // The piece a ?piece= address opens. Addresses are plate numbers in plain
 // decimal: junk (fractions, hex, exponents, Infinity) opens No. 1, and
 // anything past the end of the shelf opens its last piece.
-export function openAddress(address) {
+export function openAddress(address, compose = composeEd1) {
   const s = String(address || '').trim();
   const n = /^\d+$/.test(s) ? Math.min(Math.max(1, Number(s)), LAST_PIECE) : 1;
-  return pieceOrNext(n) || pieceOrNext(n - 1, -1) || pieceOrNext(1);
+  return pieceOrNext(n, 1, compose) || pieceOrNext(n - 1, -1, compose) || pieceOrNext(1, 1, compose);
 }
 
 // ------------------------------------------------------------- midi export --
@@ -138,8 +154,10 @@ export function mountHurdyGurdy(container, opts = {}) {
   const ctx2d = canvas.getContext('2d');
 
   // ---- state ----
-  let { piece, number } = openAddress(
-    opts.piece || new URLSearchParams(location.search).get('piece'));
+  const params = new URLSearchParams(location.search);
+  const edition = opts.edition ?? editionOf(params);
+  const compose = EDITIONS[edition] || composeEd1;
+  let { piece, number } = openAddress(opts.piece || params.get('piece'), compose);
   let pos = -2;                  // performance eighths; small lead-in
   let bpm = 0;                   // signed: negative = retrograde
   let bpmTarget = 0;
@@ -195,13 +213,18 @@ export function mountHurdyGurdy(container, opts = {}) {
     piece = p; number = n; pos = startPos;
     reflatten();
     plateNo.textContent = `No. ${String(n).padStart(4, '0')}`;
-    plateInfo.textContent = `${p.key.toUpperCase()} · ${p.phrases} PHRASES`;
+    plateInfo.textContent = `${p.key.toUpperCase()} · ${p.phrases} PHRASES` +
+      (edition === 1 ? '' : ` · ED. ${edition}`);
     const bytes = midiBytes(p);
+    if (exportA.href.startsWith('blob:')) URL.revokeObjectURL(exportA.href);   // one blob, not one per piece
     exportA.href = URL.createObjectURL(new Blob([bytes], { type: 'audio/midi' }));
-    exportA.download = `chorale-${String(n).padStart(4, '0')}.mid`;
+    exportA.download = `chorale-${String(n).padStart(4, '0')}` +
+      (edition === 1 ? '' : `-ed${edition}`) + '.mid';
     try {
       const u = new URL(location.href);
       u.searchParams.set('piece', n);
+      if (edition === 1) u.searchParams.delete('ed');   // ed-less links are Edition 1
+      else u.searchParams.set('ed', edition);
       history.replaceState(null, '', u);
     } catch { /* embedded contexts may forbid this */ }
   }
@@ -236,10 +259,10 @@ export function mountHurdyGurdy(container, opts = {}) {
     // piece transitions (with a breath of silence either side); off either
     // end of the shelf, the piece in hand plays again
     if (pos >= perfTotal) {
-      const nx = pieceOrNext(number + 1) || { piece, number };
+      const nx = pieceOrNext(number + 1, 1, compose) || { piece, number };
       setPiece(nx.piece, nx.number, 0, true);     // last chord rings into the next piece
     } else if (pos < 0 && bpm < -MIN_AUDIBLE_BPM) {
-      const pv = pieceOrNext(Math.max(1, number - 1), -1) || { piece, number };
+      const pv = pieceOrNext(Math.max(1, number - 1), -1, compose) || { piece, number };
       setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) - 0.01, true);
     }
 
@@ -459,6 +482,7 @@ export function mountHurdyGurdy(container, opts = {}) {
     themeObserver.disconnect();
     if (choir) { choir.releaseAll(0.05); sounding.clear(); }
     if (audioCtx) audioCtx.close();
+    if (exportA.href.startsWith('blob:')) URL.revokeObjectURL(exportA.href);
     container.innerHTML = '';
   };
 }

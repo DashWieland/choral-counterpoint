@@ -1,9 +1,11 @@
-// Batch validation of the JS engine port: compose pieces No. 1..200,
-// demand every one violation-free, report stats, and check that pieces
-// 1..200 still match Edition 1 (golden-ed1.json; golden.mjs checks 20,000).
+// Batch validation of engine.js (the working copy of the next edition):
+// compose pieces No. 1..200, demand every one violation-free, report stats.
+// Then check that frozen Edition 1 (engine-ed1.js) still plays its pieces
+// 1..200 (golden-ed1.json; golden.mjs checks 20,000), and say whether
+// engine.js still plays Edition 1's pieces.
 import { readFileSync } from 'node:fs';
 import { composePiece, checkChorale } from './engine.js';
-import { digestOf, digestOfDigests } from './golden.mjs';
+import { digestOf, digestOfDigests, rangeDigest } from './golden.mjs';
 
 const t0 = Date.now();
 let ok = 0, failed = 0, chrom = 0, warnings = 0, ornaments = 0, slots = 0;
@@ -49,5 +51,8 @@ console.log(`soprano intervals: ${top}`);
 console.log('keys:', Object.entries(keys).map(([k,c])=>`${k}×${c}`).join(' '));
 
 const golden = JSON.parse(readFileSync(new URL('./golden-ed1.json', import.meta.url), 'utf8'));
-if (digestOfDigests(digests) === golden.first200) console.log('Edition 1: pieces 1..200 unchanged');
+if (rangeDigest(1, 200) === golden.first200) console.log('Edition 1 (engine-ed1.js): pieces 1..200 unchanged');
 else { console.log('EDITION 1 CHANGED: pieces 1..200 differ from golden-ed1.json'); process.exitCode = 1; }
+console.log(digestOfDigests(digests) === golden.first200
+  ? 'engine.js still plays Edition 1 (pieces 1..200)'
+  : 'engine.js plays different pieces from Edition 1 (expected once the next edition diverges)');

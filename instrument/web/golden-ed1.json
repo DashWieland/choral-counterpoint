@@ -1,6 +1,6 @@
 {
  "edition": 1,
- "note": "composePiece(n) of instrument/web/engine.js. Never rewrite this file to make a test pass: a mismatch means ?piece=N links now play different music.",
+ "note": "composePiece(n) of instrument/web/engine-ed1.js (Edition 1, frozen). Never rewrite this file to make a test pass: a mismatch means ?piece=N links now play different music.",
  "pieces": {
   "1": "d6e2024180d8938e",
   "2": "2a5d35f2645ddddc",
