@@ -224,3 +224,14 @@ Dash's play-testing taught us better:
   next edition. `?ed=` picks an edition; a link without it is Edition 1,
   and a fresh visit plays the current edition. Past Edition 1, the plate
   adds `· ED. N` and the MIDI file is named `-edN`.
+- **Bar form** (2026-09, Edition 2's working copy, not yet released).
+  Lutheran chorale tunes are Stollen, Stollen, Abgesang, so the planner
+  writes that: one or two phrases sung twice, then two or three new ones,
+  sometimes ending on the Stollen's last phrase again. Pieces run 4 to 8
+  phrases (a median of 45 chords, 46 seconds under the motor, against 15
+  chords and 16 seconds in Edition 1), and the plate counts the real
+  phrases. The repeat is literal down to the ornaments, as under Bach's
+  repeat signs: inside it the bass and inner-voice searches may only repeat
+  themselves, so they choose a Stollen that can be sung twice. The
+  measurements behind each choice are in the engine review
+  (`docs/engine-review/`).

@@ -13,6 +13,10 @@ ornament a broken skeleton and you get a decorated broken skeleton.
 Output is event-format JSON carrying its skeleton, pre-verified against
 check_ornaments: every candidate ornament that would create a violation is
 simply not applied (propose → verify → keep only survivors).
+
+A chorale in bar form may carry "stollen": the number of opening chords sung
+again right after them. Every ornament there is written into the repeat too,
+so the repeat stays literal.
 """
 import json, random, sys
 from pathlib import Path
@@ -58,6 +62,8 @@ def ornament(d, density=1.0, seed=7):
     ferm = sorted(d.get('fermatas', ()))
     n = len(skel['soprano'])
     ferm_set = set(ferm)
+    rep = int(d.get('stollen', 0))                 # the Stollen's chords, repeated literally
+    mirror = lambda i: rep and rep <= i < 2 * rep  # the repeat's own slots are never drawn for
     # events[v][i] = list of (midi, eighths) for slot i
     events = {v: [[(skel[v][i], 2)] for i in range(n)] for v in VOICES}
     claimed = {v: [False] * n for v in VOICES}     # slot already reshaped
@@ -72,6 +78,10 @@ def ornament(d, density=1.0, seed=7):
         """Tentatively apply; keep only if no violations AND no new surface
         parallels/clashes appear (stricter than the checker: Bach tolerates a
         few ornamental parallels, but we don't get to write new ones)."""
+        # an ornament in the Stollen is written into its repeat as well
+        twins = [(s + rep, ev) for s, ev in zip(claim_slots, new_events) if rep and s < rep]
+        claim_slots = list(claim_slots) + [s for s, _ in twins]
+        new_events = list(new_events) + [ev for _, ev in twins]
         old = [events[voice][s] for s in claim_slots]
         _, noise_before = surface_noise(build(events, skel, ferm, tonic, mode))
         for s, ev in zip(claim_slots, new_events):
@@ -89,7 +99,7 @@ def ornament(d, density=1.0, seed=7):
     for v in VOICES[:3]:                                    # S, A, T (bass suspensions: later)
         p = rate('suspensions', v, 'sus', 'opportunity')
         for i in range(1, n):
-            if claimed[v][i] or claimed[v][i-1] or i + 1 in ferm_set:
+            if claimed[v][i] or claimed[v][i-1] or i + 1 in ferm_set or mirror(i):
                 continue
             prev, cur = skel[v][i-1], skel[v][i]
             if not 1 <= prev - cur <= 2:
@@ -104,7 +114,7 @@ def ornament(d, density=1.0, seed=7):
     # 2. passing tones (fill thirds), most active voice first
     for v in ['bass', 'tenor', 'alto', 'soprano']:
         for i in range(n - 1):
-            if claimed[v][i] or i + 1 in ferm_set:      # never subdivide a fermata chord
+            if claimed[v][i] or i + 1 in ferm_set or mirror(i):   # never subdivide a fermata chord
                 continue
             x, z = skel[v][i], skel[v][i+1]
             if abs(z - x) not in (3, 4):
@@ -121,7 +131,7 @@ def ornament(d, density=1.0, seed=7):
     for v in ['bass', 'alto', 'tenor', 'soprano']:
         p = rate('neighbors', v, 'neighbor', 'plain')
         for i in range(n - 1):
-            if claimed[v][i] or i + 1 in ferm_set:
+            if claimed[v][i] or i + 1 in ferm_set or mirror(i):
                 continue
             x, z = skel[v][i], skel[v][i+1]
             if x != z:
@@ -136,13 +146,16 @@ def ornament(d, density=1.0, seed=7):
     p_ant = rate('anticipations', 'soprano', 'ant', 'plain')
     for f in ferm:
         i = f - 2                                           # slot before the cadence chord
-        if i < 0 or claimed['soprano'][i]:
+        if i < 0 or claimed['soprano'][i] or mirror(i):
             continue
         x, z = skel['soprano'][i], skel['soprano'][i+1]
         if 1 <= abs(x - z) <= 2 and rng.random() < min(1.0, p_ant * density * 4):
             try_apply('soprano', i, [[(x, 1), (z, 1)]], [i])
 
-    return build(events, skel, ferm, tonic, mode)
+    out = build(events, skel, ferm, tonic, mode)
+    if rep:
+        out['stollen'] = rep
+    return out
 
 def build(events, skel, ferm, tonic, mode):
     voices_out = {}

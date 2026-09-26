@@ -1,5 +1,7 @@
 // Batch validation of engine.js (the working copy of the next edition):
-// compose pieces No. 1..200, demand every one violation-free, report stats.
+// compose pieces No. 1..200, demand every one violation-free and in bar form
+// (the Stollen sung twice note for note, ornaments included; phrases of a
+// hymn meter's 6 to 8 notes; one climax; the plate's count right), report stats.
 // Then check that frozen Edition 1 (engine-ed1.js) still plays its pieces
 // 1..200 (golden-ed1.json; golden.mjs checks 20,000), and say whether
 // engine.js still plays Edition 1's pieces.
@@ -13,6 +15,8 @@ const keys = {};
 const intervals = {};
 const digests = [];
 const mod12 = x => ((x % 12) + 12) % 12;
+// a voice's sounding pitch at every eighth
+const grid = evs => evs.flatMap(([m, ln]) => Array(ln).fill(m));
 let firstDraft = 0, drafts = 0;
 for (let n = 1; n <= 200; n++) {
   const p = composePiece(n);
@@ -25,6 +29,19 @@ for (let n = 1; n <= 200; n++) {
   if (['s', 'a', 't', 'b'].some(v => sk[v].some(m => !Number.isInteger(m)))) broken.push('a note is not a pitch');
   if (mod12(sk.s[last] - p.tonicPc) || mod12(sk.b[last] - p.tonicPc)) broken.push('does not end on the tonic');
   if (sk.s.some(m => m < 60 || m > 81)) broken.push('soprano out of range');
+  // bar form
+  const L = p.form.stollenChords;
+  const ends = p.fermataEighths.map(e => e / 2 + 1);           // phrase-final chords, 1-based
+  const lens = ends.map((f, i) => f - (i ? ends[i - 1] : 0));
+  if (p.phrases !== ends.length || p.form.labels.length !== ends.length) broken.push('the plate miscounts the phrases');
+  if (lens.some(l => l < 6 || l > 8)) broken.push(`a phrase outside the hymn meters (${lens.join(' ')})`);
+  if (!ends.includes(L) || !ends.includes(2 * L)) broken.push('the Stollen does not end on a phrase');
+  if (['s', 'a', 't', 'b'].some(v => sk[v].slice(0, L).join() !== sk[v].slice(L, 2 * L).join()))
+    broken.push('the repeat is not the Stollen chord for chord');
+  if (['s', 'a', 't', 'b'].some(v => { const g = grid(p.events[v]); return g.slice(0, 2 * L).join() !== g.slice(2 * L, 4 * L).join(); }))
+    broken.push('the repeat is not the Stollen ornament for ornament');
+  const top = Math.max(...sk.s);
+  if (sk.s.filter(m => m === top).length !== 1) broken.push('the climax sounds more than once');
   if (broken.length) { failed++; console.log(`No. ${n}: ${broken.join('; ')}`); continue; }
   drafts += p.attempt + 1;
   if (p.attempt === 0) firstDraft++;
@@ -53,7 +70,7 @@ for (let n = 1; n <= 200; n++) {
 }
 const ms = (Date.now() - t0) / 200;
 console.log(`\n${ok}/200 clean, ${failed} failed | ${ms.toFixed(1)} ms/piece`);
-// census: Edition 2 keeps the first draft at ~97.7% of addresses (lab, 1..20,000)
+// census: Edition 2 keeps the first draft at 96.9% of addresses 1..20,000 (census.mjs)
 const firstShare = firstDraft / Math.max(ok, 1);
 console.log(`census: first draft kept at ${(100 * firstShare).toFixed(1)}% of addresses, ` +
             `${(drafts / Math.max(ok, 1)).toFixed(2)} drafts per piece`);
