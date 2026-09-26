@@ -406,13 +406,16 @@ export function mountHurdyGurdy(container, opts = {}) {
     impulse(-e.deltaY * 0.12);
   }, { passive: false });
 
-  // drag = real cranking: the arm follows the finger's angle around the hub
-  // (jog-wheel style); on release the flywheel coasts from the last speed.
-  // A vertical swipe past the hub is an arc around it, so straight swipes
-  // still work. Clockwise is forward; circling backward plays retrograde.
+  // drag = real cranking: while a button, finger or pen is down on the crank,
+  // the arm follows its angle around the hub (jog-wheel style); on release
+  // the flywheel coasts from the last speed. A mouse passing over the crank
+  // turns nothing (it used to: hovering took the arm, and the arm then
+  // ignored the wheel). A vertical swipe past the hub is an arc around it,
+  // so straight swipes still work. Clockwise is forward; circling backward
+  // plays retrograde.
   const crankSvg = crankUnit.querySelector('.hg-crank');
-  let dragAngle = null, dragTime = 0;
-  dragging = () => dragAngle !== null;
+  let dragId = null, dragAngle = null, dragTime = 0;
+  dragging = () => dragId !== null;
   const angleAt = e => {
     const b = crankSvg.getBoundingClientRect();
     const cx = b.x + b.width * (60 / 120), cy = b.y + b.height * (60 / 132);
@@ -420,16 +423,24 @@ export function mountHurdyGurdy(container, opts = {}) {
     return Math.hypot(dx, dy) < 10 ? null : Math.atan2(dy, dx);
   };
   crankUnit.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || dragId !== null) return;   // the primary button, a finger or a pen tip
+    dragId = e.pointerId;
     dragAngle = angleAt(e);
     dragTime = performance.now();
     try { crankUnit.setPointerCapture(e.pointerId); } catch {}
+    crankUnit.classList.add('hg-cranking');
     ensureAudio();
     lastUserInput = performance.now() / 1000;
   });
   crankUnit.addEventListener('pointermove', e => {
-    if (dragAngle === null) { dragAngle = angleAt(e); return; }
+    if (e.pointerId !== dragId) return;          // hovering turns nothing
     const a = angleAt(e);
-    if (a === null) return;                      // finger over the hub center
+    if (a === null) return;                      // over the hub center
+    if (dragAngle === null) {                    // pressed on the hub: start from here
+      dragAngle = a;
+      dragTime = performance.now();
+      return;
+    }
     let d = a - dragAngle;
     if (d > Math.PI) d -= 2 * Math.PI;
     if (d < -Math.PI) d += 2 * Math.PI;
@@ -443,9 +454,15 @@ export function mountHurdyGurdy(container, opts = {}) {
       0.6 * bpmTarget + 0.4 * gestureBpm));
     lastUserInput = now / 1000;
   });
-  const endDrag = () => { dragAngle = null; };
+  const endDrag = e => {
+    if (e.pointerId !== dragId) return;
+    dragId = null;
+    dragAngle = null;
+    crankUnit.classList.remove('hg-cranking');
+  };
   crankUnit.addEventListener('pointerup', endDrag);
   crankUnit.addEventListener('pointercancel', endDrag);
+  crankUnit.addEventListener('lostpointercapture', endDrag);
   bpmSet.addEventListener('input', () => { motorBpm = Number(bpmSet.value); });
   motorBtn.addEventListener('click', () => {
     ensureAudio();
