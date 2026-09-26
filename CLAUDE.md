@@ -32,7 +32,9 @@ layer that skipped ground-truth confrontation shipped with bugs.
    search behavior renumbers the entire infinite library. Before touching
    it: hash pieces 1–10 before/after (see the mulberry32 fix in git log for
    the pattern). Behavior-changing edits are allowed but are a breaking
-   change to be called out loudly.
+   change to be called out loudly. Addresses are parsed in `machine.js`
+   (`openAddress`): plain decimal, No. 1 to `MAX_SAFE_INTEGER` — one
+   further and n + 1 === n, which stalled the crank and froze the tab.
 2. **Python and JS engines are siblings, not clones.** Same design, same
    tables, independent PRNGs. Don't expect identical pieces across them.
 3. **Checkers are calibrated against Bach**, deliberately a bit stricter
@@ -44,6 +46,8 @@ layer that skipped ground-truth confrontation shipped with bugs.
 
 - JS engine batch: `cd instrument/web && node test_engine.mjs`
   (expects 200/200 clean, ~12 ms/piece, determinism check included)
+- Machine address contract: `cd instrument/web && node test_machine.mjs`
+  (`?piece=` parsing, both ends of the shelf, null-chorale skipping; <1 s)
 - Checker false-alarm run: `python tools/validate_checker.py`
 - Clean-room scoring: `python tools/cleanroom_eval.py "feste Burg"`
 - Serve the machine locally: launch config "instrument" → localhost:8901

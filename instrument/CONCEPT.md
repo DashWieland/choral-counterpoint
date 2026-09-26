@@ -203,3 +203,10 @@ Dash's play-testing taught us better:
   44px-floor targets and a fattened slider thumb.
 - **SPA teardown:** mount returns a dispose function; navigation silences
   the machine.
+- **The shelf has ends** (2026-09). Addresses are plain decimal, No. 1 to
+  No. 9,007,199,254,740,991 (`MAX_SAFE_INTEGER`); one further and
+  n + 1 === n, which stalled the crank on one piece, or froze the tab when
+  that piece was null. Junk opens No. 1, past the end opens the last piece,
+  and cranking off either end replays the piece in hand. Null chorales
+  appear past ~1e15, where the retry seeds lose float precision (~4% near
+  the top), and are stepped over.
