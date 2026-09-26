@@ -217,3 +217,10 @@ Dash's play-testing taught us better:
   3,000 pieces under a different math library. `log1p.js` freezes Chrome's
   values, and `golden.mjs` holds digests of pieces 1–20,000 so any change
   that would renumber the library fails loudly.
+- **Editions** (2026-09). Every improvement to the engine renumbers much
+  of the library, so each released edition is frozen in its own file.
+  Edition 1 (`engine-ed1.js`, `tables-ed1.js`) is what every link shared
+  before editions plays, forever. `engine.js` is the working copy of the
+  next edition. `?ed=` picks an edition; a link without it is Edition 1,
+  and a fresh visit plays the current edition. Past Edition 1, the plate
+  adds `· ED. N` and the MIDI file is named `-edN`.
