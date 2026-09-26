@@ -1,4 +1,137 @@
 {
+ "barform-built": {
+  "name": "built",
+  "planner": "barform",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules",
+   "literalRepeat",
+   "joinFree",
+   "endLookahead",
+   "splitmixSeed"
+  ],
+  "opts": {},
+  "N": 3000,
+  "nulls": 0,
+  "meanAttempts": 1.029,
+  "meanTries": 1.029,
+  "firstAttemptShare": 0.972,
+  "firstTryShare": 0.972,
+  "maxAttempts": 3,
+  "meanChords": 44.084666666666664,
+  "chordsHist": {
+   "20": 244,
+   "30": 703,
+   "40": 1301,
+   "50": 651,
+   "60": 101
+  },
+  "stages": {
+   "kept": 3000,
+   "inner": 82,
+   "bass": 5
+  },
+  "failedAttemptStage": {
+   "inner": 82,
+   "bass": 5
+  },
+  "violations": {},
+  "sop": {
+   "rep": 17760,
+   "step": 89842,
+   "third": 13053,
+   "fourth": 5609,
+   "fifth": 1882,
+   "sixth": 1108,
+   "larger": 0,
+   "n": 129254
+  },
+  "sopIn": {
+   "rep": 14240,
+   "step": 86355,
+   "third": 9572,
+   "fourth": 3514,
+   "fifth": 666,
+   "sixth": 0,
+   "larger": 0,
+   "n": 114347
+  },
+  "sopB": {
+   "rep": 3520,
+   "step": 3487,
+   "third": 3481,
+   "fourth": 2095,
+   "fifth": 1216,
+   "sixth": 1108,
+   "larger": 0,
+   "n": 14907
+  },
+  "meanAmbitus": 12.111,
+  "ambitusHist": {
+   "5": 1,
+   "6": 1,
+   "7": 39,
+   "8": 139,
+   "9": 227,
+   "10": 351,
+   "11": 40,
+   "12": 1015,
+   "13": 293,
+   "14": 584,
+   "15": 215,
+   "16": 61,
+   "17": 34
+  },
+  "lowest": 62,
+  "highest": 79,
+  "meanPitch": 70.56398908562785,
+  "sopOutOfRangePieces": 0,
+  "warningsPerPiece": 1.496,
+  "warningsPer10Chords": 0.3393470140789693,
+  "warnPieces": 1949,
+  "warnings": {
+   "doubled leading tone": 966,
+   "antiparallel": 668,
+   "direct fifths": 446,
+   "a: melodic tritone": 227,
+   "b: melodic tritone": 85,
+   "t: melodic tritone": 302,
+   "direct octaves": 63
+  },
+  "distinctSopranos": 3000,
+  "distinctPieces": 3000,
+  "msPerAddress": 70.1866268666668,
+  "stollen": {
+   "pieces": 3000,
+   "sameBass": 1,
+   "sameSkeleton": 1,
+   "sameSkeletonAfterFirstChord": 1,
+   "sameSurface": 1,
+   "meanChordsDiffering": 0,
+   "meanStollenChords": 13.018333333333333,
+   "firstDiffHist": {}
+  },
+  "reprise": {
+   "pieces": 571,
+   "sameBass": 0.3274956217162872,
+   "sameSkeleton": 0.05253940455341506
+  },
+  "forms": {
+   "ABABCDB": 311,
+   "ABABCDE": 626,
+   "ABABCD": 1187,
+   "AABC": 616,
+   "AABCA": 106,
+   "ABABCDEB": 154
+  },
+  "wallSeconds": 13.712
+ },
  "barform-ed2-barform": {
   "name": "ed2-barform",
   "planner": "barform",
@@ -215,6 +348,655 @@
   "distinctPieces": 2999,
   "msPerAddress": 12.06048713333332,
   "wallSeconds": 4.732
+ },
+ "barform-ed2": {
+  "name": "barform-ed2",
+  "flags": [
+   "barform",
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules",
+   "splitmixSeed",
+   "literalRepeat",
+   "joinFree",
+   "endLookahead"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 20645,
+  "firstDraft": 19387,
+  "stages": {
+   "kept": 20000,
+   "inner": 570,
+   "bass": 72,
+   "surface": 3
+  },
+  "maxDrafts": 5,
+  "maxAt": 15656,
+  "warnPieces": 12836,
+  "warnings": {
+   "doubled leading tone": 6387,
+   "antiparallel": 4586,
+   "direct fifths": 2828,
+   "a: melodic tritone": 1337,
+   "b: melodic tritone": 522,
+   "t: melodic tritone": 2071,
+   "direct octaves": 374
+  },
+  "lastNotTonic": 0,
+  "sopRange": 0,
+  "byKey": {
+   "A major": {
+    "pieces": 1564,
+    "drafts": 1603
+   },
+   "G major": {
+    "pieces": 1538,
+    "drafts": 1614
+   },
+   "C major": {
+    "pieces": 1599,
+    "drafts": 1686
+   },
+   "Bb major": {
+    "pieces": 1576,
+    "drafts": 1613
+   },
+   "C minor": {
+    "pieces": 1243,
+    "drafts": 1267
+   },
+   "A minor": {
+    "pieces": 1350,
+    "drafts": 1367
+   },
+   "Eb major": {
+    "pieces": 1533,
+    "drafts": 1575
+   },
+   "Bb minor": {
+    "pieces": 1270,
+    "drafts": 1291
+   },
+   "Eb minor": {
+    "pieces": 1294,
+    "drafts": 1404
+   },
+   "D minor": {
+    "pieces": 1284,
+    "drafts": 1307
+   },
+   "F major": {
+    "pieces": 1613,
+    "drafts": 1636
+   },
+   "D major": {
+    "pieces": 1624,
+    "drafts": 1672
+   },
+   "F minor": {
+    "pieces": 1267,
+    "drafts": 1355
+   },
+   "G minor": {
+    "pieces": 1245,
+    "drafts": 1255
+   }
+  },
+  "undef": 0,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 645,
+  "firstTune": 19387,
+  "lastBassNotTonic": 0,
+  "meanDrafts": 1.0322,
+  "firstDraftShare": 0.9694,
+  "meanTunesDiscarded": 0.0323,
+  "firstTuneShare": 0.9694,
+  "wallSeconds": 81.668
+ },
+ "barform-repeat-copied-freejoin-end": {
+  "name": "repeat-copied-freejoin-end",
+  "planner": "barform",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules",
+   "literalRepeat",
+   "joinFree",
+   "endLookahead"
+  ],
+  "opts": {},
+  "N": 3000,
+  "nulls": 0,
+  "meanAttempts": 1.0356666666666667,
+  "meanTries": 1.0356666666666667,
+  "firstAttemptShare": 0.965,
+  "firstTryShare": 0.965,
+  "maxAttempts": 3,
+  "meanChords": 44.035333333333334,
+  "chordsHist": {
+   "20": 239,
+   "30": 712,
+   "40": 1319,
+   "50": 627,
+   "60": 103
+  },
+  "stages": {
+   "kept": 3000,
+   "inner": 99,
+   "bass": 8
+  },
+  "failedAttemptStage": {
+   "inner": 99,
+   "bass": 8
+  },
+  "violations": {},
+  "sop": {
+   "rep": 17864,
+   "step": 89608,
+   "third": 13128,
+   "fourth": 5485,
+   "fifth": 2013,
+   "sixth": 1008,
+   "larger": 0,
+   "n": 129106
+  },
+  "sopIn": {
+   "rep": 14384,
+   "step": 86157,
+   "third": 9552,
+   "fourth": 3402,
+   "fifth": 691,
+   "sixth": 0,
+   "larger": 0,
+   "n": 114186
+  },
+  "sopB": {
+   "rep": 3480,
+   "step": 3451,
+   "third": 3576,
+   "fourth": 2083,
+   "fifth": 1322,
+   "sixth": 1008,
+   "larger": 0,
+   "n": 14920
+  },
+  "meanAmbitus": 12.151,
+  "ambitusHist": {
+   "5": 1,
+   "6": 5,
+   "7": 30,
+   "8": 126,
+   "9": 231,
+   "10": 343,
+   "11": 38,
+   "12": 1038,
+   "13": 275,
+   "14": 607,
+   "15": 194,
+   "16": 70,
+   "17": 42
+  },
+  "lowest": 62,
+  "highest": 79,
+  "meanPitch": 70.53580718790242,
+  "sopOutOfRangePieces": 0,
+  "warningsPerPiece": 1.485,
+  "warningsPer10Chords": 0.33722919473755925,
+  "warnPieces": 1913,
+  "warnings": {
+   "doubled leading tone": 971,
+   "direct octaves": 63,
+   "direct fifths": 427,
+   "antiparallel": 656,
+   "b: melodic tritone": 68,
+   "t: melodic tritone": 330,
+   "a: melodic tritone": 177
+  },
+  "distinctSopranos": 3000,
+  "distinctPieces": 3000,
+  "msPerAddress": 69.8685135666667,
+  "stollen": {
+   "pieces": 3000,
+   "sameBass": 1,
+   "sameSkeleton": 1,
+   "sameSkeletonAfterFirstChord": 1,
+   "sameSurface": 1,
+   "meanChordsDiffering": 0,
+   "meanStollenChords": 13.068666666666667,
+   "firstDiffHist": {}
+  },
+  "reprise": {
+   "pieces": 550,
+   "sameBass": 0.31272727272727274,
+   "sameSkeleton": 0.06181818181818182
+  },
+  "forms": {
+   "ABABCDE": 596,
+   "AABC": 604,
+   "ABABCD": 1250,
+   "ABABCDB": 304,
+   "ABABCDEB": 158,
+   "AABCA": 88
+  },
+  "wallSeconds": 13.7
+ },
+ "barform-repeat-copied-freejoin": {
+  "name": "repeat-copied-freejoin",
+  "planner": "barform",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules",
+   "literalRepeat",
+   "joinFree"
+  ],
+  "opts": {},
+  "N": 3000,
+  "nulls": 0,
+  "meanAttempts": 1.0423333333333333,
+  "meanTries": 1.0423333333333333,
+  "firstAttemptShare": 0.9583333333333334,
+  "firstTryShare": 0.9583333333333334,
+  "maxAttempts": 3,
+  "meanChords": 44.044333333333334,
+  "chordsHist": {
+   "20": 239,
+   "30": 708,
+   "40": 1324,
+   "50": 625,
+   "60": 104
+  },
+  "stages": {
+   "kept": 3000,
+   "inner": 99,
+   "bass": 28
+  },
+  "failedAttemptStage": {
+   "inner": 99,
+   "bass": 28
+  },
+  "violations": {},
+  "sop": {
+   "rep": 17855,
+   "step": 89644,
+   "third": 13134,
+   "fourth": 5490,
+   "fifth": 2003,
+   "sixth": 1007,
+   "larger": 0,
+   "n": 129133
+  },
+  "sopIn": {
+   "rep": 14371,
+   "step": 86197,
+   "third": 9549,
+   "fourth": 3409,
+   "fifth": 690,
+   "sixth": 0,
+   "larger": 0,
+   "n": 114216
+  },
+  "sopB": {
+   "rep": 3484,
+   "step": 3447,
+   "third": 3585,
+   "fourth": 2081,
+   "fifth": 1313,
+   "sixth": 1007,
+   "larger": 0,
+   "n": 14917
+  },
+  "meanAmbitus": 12.149333333333333,
+  "ambitusHist": {
+   "5": 1,
+   "6": 5,
+   "7": 30,
+   "8": 126,
+   "9": 229,
+   "10": 342,
+   "11": 39,
+   "12": 1043,
+   "13": 275,
+   "14": 608,
+   "15": 191,
+   "16": 70,
+   "17": 41
+  },
+  "lowest": 62,
+  "highest": 79,
+  "meanPitch": 70.53479583826997,
+  "sopOutOfRangePieces": 0,
+  "warningsPerPiece": 1.4793333333333334,
+  "warningsPer10Chords": 0.33587370301135977,
+  "warnPieces": 1910,
+  "warnings": {
+   "doubled leading tone": 961,
+   "direct octaves": 63,
+   "direct fifths": 423,
+   "antiparallel": 658,
+   "b: melodic tritone": 68,
+   "t: melodic tritone": 328,
+   "a: melodic tritone": 178
+  },
+  "distinctSopranos": 3000,
+  "distinctPieces": 3000,
+  "msPerAddress": 71.4713642333333,
+  "stollen": {
+   "pieces": 3000,
+   "sameBass": 1,
+   "sameSkeleton": 1,
+   "sameSkeletonAfterFirstChord": 1,
+   "sameSurface": 1,
+   "meanChordsDiffering": 0,
+   "meanStollenChords": 13.074,
+   "firstDiffHist": {}
+  },
+  "reprise": {
+   "pieces": 547,
+   "sameBass": 0.3071297989031079,
+   "sameSkeleton": 0.06398537477148081
+  },
+  "forms": {
+   "ABABCDE": 595,
+   "AABC": 606,
+   "ABABCD": 1252,
+   "ABABCDB": 302,
+   "ABABCDEB": 159,
+   "AABCA": 86
+  },
+  "wallSeconds": 13.975
+ },
+ "barform-repeat-copied": {
+  "name": "repeat-copied",
+  "planner": "barform",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules",
+   "literalRepeat"
+  ],
+  "opts": {},
+  "N": 3000,
+  "nulls": 0,
+  "meanAttempts": 1.0523333333333333,
+  "meanTries": 1.0523333333333333,
+  "firstAttemptShare": 0.9493333333333334,
+  "firstTryShare": 0.9493333333333334,
+  "maxAttempts": 3,
+  "meanChords": 44.047666666666665,
+  "chordsHist": {
+   "20": 236,
+   "30": 713,
+   "40": 1320,
+   "50": 627,
+   "60": 104
+  },
+  "stages": {
+   "kept": 3000,
+   "bass": 49,
+   "inner": 108
+  },
+  "failedAttemptStage": {
+   "bass": 49,
+   "inner": 108
+  },
+  "violations": {},
+  "sop": {
+   "rep": 17878,
+   "step": 89640,
+   "third": 13160,
+   "fourth": 5475,
+   "fifth": 1979,
+   "sixth": 1011,
+   "larger": 0,
+   "n": 129143
+  },
+  "sopIn": {
+   "rep": 14369,
+   "step": 86195,
+   "third": 9556,
+   "fourth": 3416,
+   "fifth": 689,
+   "sixth": 0,
+   "larger": 0,
+   "n": 114225
+  },
+  "sopB": {
+   "rep": 3509,
+   "step": 3445,
+   "third": 3604,
+   "fourth": 2059,
+   "fifth": 1290,
+   "sixth": 1011,
+   "larger": 0,
+   "n": 14918
+  },
+  "meanAmbitus": 12.150333333333334,
+  "ambitusHist": {
+   "5": 1,
+   "6": 5,
+   "7": 30,
+   "8": 125,
+   "9": 236,
+   "10": 339,
+   "11": 37,
+   "12": 1041,
+   "13": 273,
+   "14": 605,
+   "15": 196,
+   "16": 70,
+   "17": 42
+  },
+  "lowest": 62,
+  "highest": 79,
+  "meanPitch": 70.54047163749036,
+  "sopOutOfRangePieces": 0,
+  "warningsPerPiece": 1.399,
+  "warningsPer10Chords": 0.3176104674481433,
+  "warnPieces": 1808,
+  "warnings": {
+   "doubled leading tone": 951,
+   "direct fifths": 416,
+   "direct octaves": 56,
+   "antiparallel": 487,
+   "b: melodic tritone": 73,
+   "t: melodic tritone": 346,
+   "a: melodic tritone": 183
+  },
+  "distinctSopranos": 3000,
+  "distinctPieces": 3000,
+  "msPerAddress": 70.99472573333334,
+  "stollen": {
+   "pieces": 3000,
+   "sameBass": 1,
+   "sameSkeleton": 1,
+   "sameSkeletonAfterFirstChord": 1,
+   "sameSurface": 1,
+   "meanChordsDiffering": 0,
+   "meanStollenChords": 13.073,
+   "firstDiffHist": {}
+  },
+  "reprise": {
+   "pieces": 548,
+   "sameBass": 0.2864963503649635,
+   "sameSkeleton": 0.06204379562043796
+  },
+  "forms": {
+   "ABABCDE": 595,
+   "AABC": 606,
+   "ABABCD": 1251,
+   "ABABCDB": 303,
+   "ABABCDEB": 159,
+   "AABCA": 86
+  },
+  "wallSeconds": 13.789
+ },
+ "barform-repeat-varied": {
+  "name": "repeat-varied",
+  "planner": "barform",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules"
+  ],
+  "opts": {},
+  "N": 3000,
+  "nulls": 0,
+  "meanAttempts": 1.0523333333333333,
+  "meanTries": 1.0523333333333333,
+  "firstAttemptShare": 0.95,
+  "firstTryShare": 0.95,
+  "maxAttempts": 3,
+  "meanChords": 44.043,
+  "chordsHist": {
+   "20": 239,
+   "30": 705,
+   "40": 1332,
+   "50": 621,
+   "60": 103
+  },
+  "stages": {
+   "kept": 3000,
+   "inner": 118,
+   "bass": 39
+  },
+  "failedAttemptStage": {
+   "inner": 118,
+   "bass": 39
+  },
+  "violations": {},
+  "sop": {
+   "rep": 17901,
+   "step": 89610,
+   "third": 13123,
+   "fourth": 5474,
+   "fifth": 2012,
+   "sixth": 1009,
+   "larger": 0,
+   "n": 129129
+  },
+  "sopIn": {
+   "rep": 14399,
+   "step": 86175,
+   "third": 9543,
+   "fourth": 3393,
+   "fifth": 708,
+   "sixth": 0,
+   "larger": 0,
+   "n": 114218
+  },
+  "sopB": {
+   "rep": 3502,
+   "step": 3435,
+   "third": 3580,
+   "fourth": 2081,
+   "fifth": 1304,
+   "sixth": 1009,
+   "larger": 0,
+   "n": 14911
+  },
+  "meanAmbitus": 12.155666666666667,
+  "ambitusHist": {
+   "5": 1,
+   "6": 5,
+   "7": 30,
+   "8": 125,
+   "9": 230,
+   "10": 343,
+   "11": 40,
+   "12": 1040,
+   "13": 266,
+   "14": 609,
+   "15": 202,
+   "16": 65,
+   "17": 44
+  },
+  "lowest": 62,
+  "highest": 79,
+  "meanPitch": 70.53788171938045,
+  "sopOutOfRangePieces": 0,
+  "warningsPerPiece": 1.3646666666666667,
+  "warningsPer10Chords": 0.30984870845915735,
+  "warnPieces": 1888,
+  "warnings": {
+   "doubled leading tone": 1030,
+   "direct fifths": 442,
+   "direct octaves": 28,
+   "a: melodic tritone": 205,
+   "b: melodic tritone": 72,
+   "t: melodic tritone": 334,
+   "antiparallel": 527
+  },
+  "distinctSopranos": 3000,
+  "distinctPieces": 3000,
+  "msPerAddress": 85.65254290000016,
+  "stollen": {
+   "pieces": 3000,
+   "sameBass": 0.22166666666666668,
+   "sameSkeleton": 0.03266666666666666,
+   "sameSkeletonAfterFirstChord": 0.06833333333333333,
+   "sameSurface": 0.0003333333333333333,
+   "meanChordsDiffering": 6.969666666666667,
+   "meanStollenChords": 13.078,
+   "firstDiffHist": {
+    "0": 2618,
+    "1": 51,
+    "2": 34,
+    "3": 37,
+    "4": 21,
+    "5": 29,
+    "6": 20,
+    "7": 17,
+    "8": 14,
+    "9": 11,
+    "10": 12,
+    "11": 12,
+    "12": 9,
+    "13": 8,
+    "14": 7,
+    "15": 2
+   }
+  },
+  "reprise": {
+   "pieces": 541,
+   "sameBass": 0.2957486136783734,
+   "sameSkeleton": 0.06469500924214418
+  },
+  "forms": {
+   "ABABCDE": 597,
+   "AABC": 604,
+   "ABABCD": 1258,
+   "ABABCDB": 296,
+   "ABABCDEB": 157,
+   "AABCA": 88
+  },
+  "wallSeconds": 16.675
  },
  "baseline": {
   "name": "baseline",
@@ -617,6 +1399,112 @@
   "meanTunesDiscarded": 0.2181,
   "firstTuneShare": 0.8297,
   "wallSeconds": 34.672
+ },
+ "ed2-splitmix": {
+  "name": "ed2-splitmix",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules",
+   "splitmixSeed"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 20477,
+  "firstDraft": 19535,
+  "stages": {
+   "kept": 20000,
+   "inner": 355,
+   "bass": 111,
+   "checker": 11
+  },
+  "maxDrafts": 3,
+  "maxAt": 3005,
+  "warnPieces": 5496,
+  "warnings": {
+   "doubled leading tone": 2918,
+   "a: melodic tritone": 469,
+   "t: melodic tritone": 438,
+   "antiparallel": 1148,
+   "direct fifths": 1070,
+   "b: melodic tritone": 72,
+   "direct octaves": 143
+  },
+  "lastNotTonic": 0,
+  "sopRange": 0,
+  "byKey": {
+   "A major": {
+    "pieces": 1564,
+    "drafts": 1588
+   },
+   "G major": {
+    "pieces": 1538,
+    "drafts": 1601
+   },
+   "C major": {
+    "pieces": 1599,
+    "drafts": 1619
+   },
+   "Bb major": {
+    "pieces": 1576,
+    "drafts": 1626
+   },
+   "C minor": {
+    "pieces": 1243,
+    "drafts": 1255
+   },
+   "A minor": {
+    "pieces": 1350,
+    "drafts": 1360
+   },
+   "Eb major": {
+    "pieces": 1533,
+    "drafts": 1583
+   },
+   "Bb minor": {
+    "pieces": 1270,
+    "drafts": 1270
+   },
+   "Eb minor": {
+    "pieces": 1294,
+    "drafts": 1359
+   },
+   "D minor": {
+    "pieces": 1284,
+    "drafts": 1349
+   },
+   "F major": {
+    "pieces": 1613,
+    "drafts": 1659
+   },
+   "D major": {
+    "pieces": 1624,
+    "drafts": 1650
+   },
+   "F minor": {
+    "pieces": 1267,
+    "drafts": 1299
+   },
+   "G minor": {
+    "pieces": 1245,
+    "drafts": 1259
+   }
+  },
+  "undef": 0,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 477,
+  "firstTune": 19535,
+  "lastBassNotTonic": 0,
+  "meanDrafts": 1.0238,
+  "firstDraftShare": 0.9768,
+  "meanTunesDiscarded": 0.0238,
+  "firstTuneShare": 0.9768,
+  "wallSeconds": 29.174
  },
  "edition2": {
   "name": "recommendedInner",

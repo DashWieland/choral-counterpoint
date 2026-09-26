@@ -28,12 +28,14 @@ There are three problems.
 
 **What fixes them.**
 - **A and B: eight small changes, now Edition 2's engine.** The first draft is kept at 97.7% of addresses, up from 63.2%. No piece ends off the tonic and no soprano leaves its range. Every key is equally easy, and the engine makes 44% fewer harmonization attempts.
-- **C: bar form.** A prototype planner writes chorale tunes as a pair of opening phrases stated twice, then new ones. Under Edition 2's rules its pieces average 44 chords, 95.3% of addresses keep their first draft, and only 2 of the first 20,000 addresses share a tune. After form come alternative harmonizations of each tune (settings), then modulation.
+- **C: bar form.** The planner writes chorale tunes as their opening phrases stated twice, then new ones. As built in #6, its pieces average 44 chords, 96.9% of the first 20,000 addresses keep their first draft, and only 4 of them share a tune. After form comes modulation.
 
-**What's built.** Almost every change renumbers much of the library, so existing links stay on a frozen Edition 1 and the improvements form Edition 2. Three pull requests are open:
-- [#1](https://github.com/DashWieland/choral-counterpoint/pull/1): Edition 1 hardening, ready.
-- [#2](https://github.com/DashWieland/choral-counterpoint/pull/2): editions, draft.
-- [#3](https://github.com/DashWieland/choral-counterpoint/pull/3): Edition 2's fixes, draft.
+**What's built.** Almost every change renumbers much of the library, so existing links stay on a frozen Edition 1 and the improvements form Edition 2:
+- [#1](https://github.com/DashWieland/choral-counterpoint/pull/1): Edition 1 hardening, merged.
+- [#5](https://github.com/DashWieland/choral-counterpoint/pull/5): the machine's CSS taken verbatim from the site (the commit #1 missed), ready.
+- [#2](https://github.com/DashWieland/choral-counterpoint/pull/2): editions, ready.
+- [#3](https://github.com/DashWieland/choral-counterpoint/pull/3): Edition 2's fixes, draft, on #2.
+- [#6](https://github.com/DashWieland/choral-counterpoint/pull/6): bar form in Edition 2, draft, on #3.
 
 Nothing a listener hears changes until you release Edition 2.
 
@@ -163,36 +165,42 @@ Lutheran chorale tunes are usually in bar form (AAB). A Stollen of one to three 
 
 Measured over addresses 1 to 3,000 with Edition 2's rules:
 
-| | Shipped planner | Bar form |
-|---|---|---|
-| Chords per piece | 15.1 | 44.0 |
-| Addresses that keep their first draft | 97.7% | 95.3% |
-| Soprano motion: step / repeat / third | 76 / 13 / 4.5% | 65 / 14 / 14% |
-| Soprano span | about a sixth | about an octave |
-| Warnings per 10 chords | 0.23 | 0.35 |
-| Length at 66 bpm, median (most pieces) | 16 s (9–26 s) | 46 s (32–57 s) |
+| | Shipped planner | Bar form, the prototype you heard | Bar form as built (#6) |
+|---|---|---|---|
+| Chords per piece | 15.1 | 44.0 | 44.1 |
+| Addresses that keep their first draft | 97.7% | 95.3% | 97.2% |
+| Soprano motion: step / repeat / third | 76 / 13 / 4.5% | 65 / 14 / 14% | 69 / 14 / 10% |
+| Soprano span | about a sixth | about an octave | about an octave |
+| Warnings per 10 chords | 0.23 | 0.35 | 0.34 |
+| Length at 66 bpm, median (most pieces) | 16 s (9–26 s) | 46 s (32–57 s) | 46 s (32–57 s) |
 
-- **Against Bach.** His sopranos, counted at each soprano onset in the oracle's corpus, step about 70% of the time, repeat 15% and move by a third 8%. The shipped planner moves by thirds too rarely and bar form too often.
-- **Duplicate tunes.** Under bar form, 2 of the first 20,000 addresses share a tune; today 438 do.
+As built, the repeat is copied (below), and each phrase's free notes are drawn from every legal completion rather than by a depth-first search. The prototype's column comes from the lab before that change (commit 23fb9f3).
+
+- **Against Bach.** His sopranos, counted at each soprano onset in the oracle's corpus with sixths folded into thirds, step about 70% of the time, repeat 15% and move by a third 8%. The shipped planner moves by thirds too rarely. The prototype did so 15% of the time: its depth-first search fell back on whatever was left after a dead end, and 36% of those redraws were thirds. Drawn from every legal completion, and with a phrase's opening and peak weighted by the distance they leave to cover, the built planner is at 11%, and steps at 69%. Down-weighting thirds directly, the degree prior and the contour pull each moved it by a point or less.
+- **Duplicate tunes.** As built, 4 of the first 20,000 addresses share a tune (2 under the prototype); today 438 do.
 - **The extra warnings** are mostly doubled leading tones under a soprano leading tone. In major keys the new tunes sit on the seventh degree a little more often than Bach's do, and on the fourth a little less.
-- **Cost.** A bar-form piece takes about three times as long to compose (still tens of milliseconds) and to play.
+- **Cost.** A bar-form piece takes about 21 ms to compose in Node, against 13, and three times as long to play.
 
-**Listening examples**, addresses 1 to 4 (not cherry-picked), in `docs/engine-review/examples/`:
+**Listening examples** of the prototype, addresses 1 to 4 (not cherry-picked), in `docs/engine-review/examples/`:
 - `shipped-000N.mid` is what `?piece=N` plays today.
 - `barform-000N.mid` is the same address under Edition 2's rules with the bar-form planner.
 - `plain-varied-000N.mid` and `plain-literal-000N.mid` are those bar-form pieces without ornaments, with the Stollen repeat re-harmonized or copied.
 - `barform-sopranos.txt` lists every tune with its phrases lettered.
 
-**The repeat, as built.**
-- The bass search carries on from the Stollen's last chord into the repeat, so 96% of repeats get a new harmonization, with about half the chords changed.
+**The repeat.**
+- In the prototype, the bass search carries on from the Stollen's last chord into the repeat, so 96% of repeats get a new harmonization, with about half the chords changed.
 - Many of Bach's four-part settings write the Stollen once under a repeat sign. He does re-harmonize a repeated Stollen elsewhere, for example in the chorale chorus of BWV 114.
 - **Copying works everywhere.** Copying the first statement's harmony into the repeat passes the checker in all 3,000 pieces tested (`barform-literal.mjs`). It adds 0.42 warnings per piece, at the two phrase breaks where the copy joins the rest.
 - So a literal repeat is purely a musical choice; the decision table has this row. `plain-varied-000N.mid` and `plain-literal-000N.mid` are the same four pieces without ornaments, differing only in the repeat's harmony.
+- **As built (#6), the repeat is copied, ornaments included.** Inside it the bass and inner-voice searches may only repeat what they wrote the first time. Measured over addresses 1 to 3,000 with the built planner:
+  - re-harmonized, 95.0% of first drafts are kept; copied, 94.9%, once a line at the Stollen's last chord must be able to start over (in the prototype, copying without that check cost 3.4 points);
+  - the move back to the Stollen's start needs no precedent in the oracle, since a repeat starts over after a breath: 95.8%;
+  - a bass line at the next-to-last chord must be able to reach the tonic, where `tonicEnd` made the beam die: 96.5%, and 97.2% with Edition 2's seeding. Wider beams bought under a point.
 
-**Limits of the prototype.**
+**Limits.**
 - No motivic link between Stollen and Abgesang, no text rhythm, and no key plan beyond cadence degrees.
-- Too many thirds, as above.
-- Its C and D tunes end on C5 and D5 to dodge the crowding. With `bassSpace` they can return to C4 and D4 (not yet measured).
+- Thirds at 11%, against Bach's 8%.
+- C and D tunes end on C5 and D5. Ending them on C4 and D4, now that the bass keeps a third below the soprano, loses first drafts in those keys (97% to 93% in C, 98% to 94% in D) and lowers the whole choir by about three semitones, so they stay high.
 - Adopting it renumbers every address.
 
 ### A wider melody grammar
@@ -286,10 +294,11 @@ Both engines change in the same commit; Python is a sibling, checked by its own 
    - The new seeding passes its census.
    - `compose.py` takes the same rules: over 2,520 pieces its first draft kept rises from 63.5% to 98.3%, and off-tonic endings fall from 25 to 0.
    - New property tests and `census.mjs`.
-5. **Bar form**, next.
-   - Port the planner and correct its thirds.
-   - Let C and D tunes end low again.
+5. **Bar form, #6.**
+   - `engine.js` matches the lab at all 20,000 addresses; the census keeps the first draft at 96.9% there and at 97.4% of 2,000 addresses up to 2^53.
+   - Thirds down from 15% to 11%; C and D tunes stay high, as measured above.
    - The repeat is literal; the plate shows the real phrase count.
+   - `compose.py` takes the same design (`engine/census.py`: first draft kept 96.9% over 2,520 pieces).
    - Then a listening session: matched key, register and tempo, per CLAUDE.md.
 6. **Release Edition 2.**
    - Freeze `engine.js` as `engine-ed2.js` with a golden file, raise `RELEASED` and `CURRENT`, and re-vendor.
@@ -319,6 +328,9 @@ Addresses 1 to 20,000 (`tools/lab/results/summary.json`). Most single fixes make
 | `exactInner` | 0.77 | 64.6% | 1.75 | 6,584 | 138 / 124 | 1,912 |
 | **Edition 2's rules** (the eight above, from `sbParallel` to `innerRules`) | **0.02** | **97.7%** | **1.02** | **5,497** | **0 / 0** | **0** |
 | Edition 2's rules + `bassFallback` | 0.01 | 99.0% | 1.08 | 5,500 | 0 / 0 | 0 |
+| **Edition 2 as built, with bar form** (#6: `barform`, `literalRepeat`, `joinFree`, `endLookahead`, `splitmixSeed`) | **0.03** | **96.9%** | **1.03** | **12,836** | **0 / 0** | **0** |
+
+Bar form's pieces are three times as long, so more of them carry a warning: 0.34 per ten chords, against 0.23 with the shipped planner.
 
 To reproduce, see `tools/lab/README.md`. For Edition 2 as built:
 
