@@ -12,6 +12,8 @@ import { Choir } from './audio.js';
 const EW = 26;                 // px per eighth at design scale
 const MOTOR_BPM = 66;
 const MAX_BPM = 140, MIN_AUDIBLE_BPM = 5;
+const LAST_PIECE = Number.MAX_SAFE_INTEGER;   // one further and n + 1 === n
+const MAX_NULL_RUN = 32;
 
 const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
@@ -22,12 +24,26 @@ function perfTotalOf(p) {
   return t;
 }
 
-function pieceOrNext(n, dir = 1) {
-  for (let k = n; ; k += dir) {
-    if (k < 1) return { piece: composePiece(1) || null, number: 1 };
+// The first piece that composes from No. n on (dir -1: backward), or null.
+// Null chorales appear past ~1e15 and reach ~4% near the top of the shelf,
+// never more than 3 in a row in a 6,000-piece scan there; the search stays
+// on the shelf and gives up after MAX_NULL_RUN, so it always returns.
+export function pieceOrNext(n, dir = 1) {
+  for (let k = n, tries = 0; tries < MAX_NULL_RUN; k += dir, tries++) {
+    if (k < 1 || k > LAST_PIECE) return null;       // off the end of the shelf
     const p = composePiece(k);
     if (p) return { piece: p, number: k };
   }
+  return null;
+}
+
+// The piece a ?piece= address opens. Addresses are plate numbers in plain
+// decimal: junk (fractions, hex, exponents, Infinity) opens No. 1, and
+// anything past the end of the shelf opens its last piece.
+export function openAddress(address) {
+  const s = String(address || '').trim();
+  const n = /^\d+$/.test(s) ? Math.min(Math.max(1, Number(s)), LAST_PIECE) : 1;
+  return pieceOrNext(n) || pieceOrNext(n - 1, -1) || pieceOrNext(1);
 }
 
 // ------------------------------------------------------------- midi export --
@@ -68,9 +84,6 @@ function midiBytes(piece, bpm = 72) {
 // ----------------------------------------------------------------- machine --
 
 export function mountHurdyGurdy(container, opts = {}) {
-  const initialNumber = Math.max(1,
-    opts.piece || Number(new URLSearchParams(location.search).get('piece')) || 1);
-
   container.innerHTML = `
   <div class="hg" style="position:relative; user-select:none;">
     <div class="hg-title">CHORAL HURDY-GURDY</div>
@@ -125,7 +138,8 @@ export function mountHurdyGurdy(container, opts = {}) {
   const ctx2d = canvas.getContext('2d');
 
   // ---- state ----
-  let { piece, number } = pieceOrNext(initialNumber);
+  let { piece, number } = openAddress(
+    opts.piece || new URLSearchParams(location.search).get('piece'));
   let pos = -2;                  // performance eighths; small lead-in
   let bpm = 0;                   // signed: negative = retrograde
   let bpmTarget = 0;
@@ -219,12 +233,13 @@ export function mountHurdyGurdy(container, opts = {}) {
     crankRot.style.transform = `rotate(${crankAngle}rad)`;
     crankRot.style.transformOrigin = '60px 60px';
 
-    // piece transitions (with a breath of silence either side)
+    // piece transitions (with a breath of silence either side); off either
+    // end of the shelf, the piece in hand plays again
     if (pos >= perfTotal) {
-      const nx = pieceOrNext(number + 1);
+      const nx = pieceOrNext(number + 1) || { piece, number };
       setPiece(nx.piece, nx.number, 0, true);     // last chord rings into the next piece
     } else if (pos < 0 && bpm < -MIN_AUDIBLE_BPM) {
-      const pv = pieceOrNext(Math.max(1, number - 1), -1);
+      const pv = pieceOrNext(Math.max(1, number - 1), -1) || { piece, number };
       setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) - 0.01, true);
     }
 

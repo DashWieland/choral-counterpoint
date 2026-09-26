@@ -3,9 +3,11 @@
 // melody planner -> bass beam search over the outer-voice oracle ->
 // inner-voice beam search under the voice-leading laws -> checker gate ->
 // corpus-rate ornamentation (with its own surface checker as the gate).
-// Deterministic: piece N is the same piece for everyone, forever.
+// Deterministic: piece N is the same piece for everyone, forever
+// (golden.mjs guards it; log1p.js keeps it true in every browser).
 
 import { TABLES } from './tables.js';
+import { log1p } from './log1p.js';
 
 const ORACLE = TABLES.outer_voice_table;
 const MELODY = TABLES.melody_table;
@@ -369,7 +371,7 @@ function bassLine(sop, fermatas, tonicPc, mode, rng, beamWidth = 10, temp = 0) {
     if (!pairs.has(rel(sop[0]) * 12 + Number(p))) continue;
     const pc = mod12(Number(p) + tonicPc);
     for (const b0 of concretize(pc, 45).slice(0, 2))
-      beams.push([Math.log1p(c) + uniform(rng, 0, temp), [b0]]);
+      beams.push([log1p(c) + uniform(rng, 0, temp), [b0]]);
   }
   for (let i = 1; i < n; i++) {
     const cad = ferm.has(i + 1) || i === n - 1 ? 1 : 0;
@@ -382,7 +384,7 @@ function bassLine(sop, fermatas, tonicPc, mode, rng, beamWidth = 10, temp = 0) {
         if (!pairs.has(rel(sop[i]) * 12 + tPc)) continue;
         const absPc = mod12(tPc + tonicPc);
         for (const cand of concretize(absPc, prev).slice(0, 2)) {
-          let s = score + Math.log1p(cnt) + uniform(rng, 0, temp);
+          let s = score + log1p(cnt) + uniform(rng, 0, temp);
           const dm = cand - prev, ds = sop[i] - sop[i - 1];
           if (dm === 0 && ds === 0) s -= 0.2;
           if ((dm < 0 && ds > 0) || (ds < 0 && dm > 0)) s += 0.6;
