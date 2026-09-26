@@ -29,10 +29,13 @@ layer that skipped ground-truth confrontation shipped with bugs.
 1. **Piece determinism is a public contract.** The live machine's piece
    No. N is `composePiece(N)`; `?piece=N` links exist in the wild. ANY
    change to `instrument/web/engine.js` that alters rng call order or
-   search behavior renumbers the entire infinite library. Before touching
-   it: hash pieces 1–10 before/after (see the mulberry32 fix in git log for
-   the pattern). Behavior-changing edits are allowed but are a breaking
-   change to be called out loudly. Addresses are parsed in `machine.js`
+   search behavior renumbers the entire infinite library, and so does
+   regenerating `tables.js` from the corpus. Before touching either: run
+   `node golden.mjs` (digests of pieces 1–20,000 in `golden-ed1.json`;
+   `test_engine.mjs` checks pieces 1–200 on every run). `log1p.js`
+   freezes the only browser-dependent maths, so a piece is also the same
+   in every browser. Behavior-changing edits are allowed but are a
+   breaking change to be called out loudly. Addresses are parsed in `machine.js`
    (`openAddress`): plain decimal, No. 1 to `MAX_SAFE_INTEGER` — one
    further and n + 1 === n, which stalled the crank and froze the tab.
 2. **Python and JS engines are siblings, not clones.** Same design, same
@@ -45,7 +48,9 @@ layer that skipped ground-truth confrontation shipped with bugs.
 ## Verification commands
 
 - JS engine batch: `cd instrument/web && node test_engine.mjs`
-  (expects 200/200 clean, ~12 ms/piece, determinism check included)
+  (expects 200/200 clean, ~12 ms/piece, pieces 1–200 match Edition 1)
+- Edition 1 golden test: `cd instrument/web && node golden.mjs`
+  (pieces 1–20,000 unchanged; about five minutes)
 - Machine address contract: `cd instrument/web && node test_machine.mjs`
   (`?piece=` parsing, both ends of the shelf, null-chorale skipping; <1 s)
 - Checker false-alarm run: `python tools/validate_checker.py`
