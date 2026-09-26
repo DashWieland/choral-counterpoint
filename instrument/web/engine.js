@@ -739,15 +739,33 @@ const KEYS = [
   ['C', 0], ['D', 2], ['Eb', 3], ['F', 5], ['G', 7], ['A', 9], ['Bb', 10],
 ];
 
+// Seeds are an integer hash of the address (splitmix64 over BigInt), exact
+// for every address up to 2^53 and with no structure. Edition 1 used
+// n*2654435761 and n*1000 + 7a + 13 in floating point: its compose streams
+// repeated every 2^29 addresses (No. 536,870,922 is No. 10 again), its key
+// choice lost precision past No. 3,393,263, and near the top every piece was
+// D minor and some addresses could not compose at all.
+const M64 = (1n << 64n) - 1n;
+function splitmix64(x) {
+  x = (x + 0x9E3779B97F4A7C15n) & M64;
+  let z = x;
+  z = ((z ^ (z >> 30n)) * 0xBF58476D1CE4E5B9n) & M64;
+  z = ((z ^ (z >> 27n)) * 0x94D049BB133111EBn) & M64;
+  return z ^ (z >> 31n);
+}
+// stream 0 picks key, mode and phrase count; stream 1 + a drives draft a
+const seedOf = (n, stream) =>
+  Number(splitmix64(BigInt(Math.floor(n)) * 64n + BigInt(stream)) & 0xFFFFFFFFn);
+
 // composePiece(n): the plate number is the seed. Deterministic forever.
 export function composePiece(pieceNumber, density = 1.0) {
-  const paramRng = mulberry32(pieceNumber * 2654435761 + 1);
+  const paramRng = mulberry32(seedOf(pieceNumber, 0));
   const [tonicName, tonicPc] = choice(paramRng, KEYS);
   const mode = paramRng() < 0.45 ? 'minor' : 'major';
   const phrases = choice(paramRng, [2, 3, 3, 4]);
 
   for (let attempt = 0; attempt < 40; attempt++) {
-    const rng = mulberry32(pieceNumber * 1000 + attempt * 7 + 13);
+    const rng = mulberry32(seedOf(pieceNumber, attempt + 1));
     const { pitches: sop, fermatas } = melody(tonicPc, mode, phrases, rng);
     const bass = bassLine(sop, fermatas, tonicPc, mode, rng, 10, 0.15 * attempt);
     if (!bass) continue;
