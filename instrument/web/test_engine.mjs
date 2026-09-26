@@ -12,11 +12,22 @@ let ok = 0, failed = 0, chrom = 0, warnings = 0, ornaments = 0, slots = 0;
 const keys = {};
 const intervals = {};
 const digests = [];
+const mod12 = x => ((x % 12) + 12) % 12;
+let firstDraft = 0, drafts = 0;
 for (let n = 1; n <= 200; n++) {
   const p = composePiece(n);
   digests.push(digestOf(p));
   if (!p) { failed++; console.log(`No. ${n}: FAILED to compose`); continue; }
   if (p.violations !== 0) { failed++; console.log(`No. ${n}: violations!`); continue; }
+  // properties the engine review found missing in Edition 1
+  const sk = p.skeleton, last = sk.s.length - 1;
+  const broken = [];
+  if (['s', 'a', 't', 'b'].some(v => sk[v].some(m => !Number.isInteger(m)))) broken.push('a note is not a pitch');
+  if (mod12(sk.s[last] - p.tonicPc) || mod12(sk.b[last] - p.tonicPc)) broken.push('does not end on the tonic');
+  if (sk.s.some(m => m < 60 || m > 81)) broken.push('soprano out of range');
+  if (broken.length) { failed++; console.log(`No. ${n}: ${broken.join('; ')}`); continue; }
+  drafts += p.attempt + 1;
+  if (p.attempt === 0) firstDraft++;
   ok++;
   warnings += p.warnings;
   keys[p.key] = (keys[p.key] || 0) + 1;
@@ -42,6 +53,12 @@ for (let n = 1; n <= 200; n++) {
 }
 const ms = (Date.now() - t0) / 200;
 console.log(`\n${ok}/200 clean, ${failed} failed | ${ms.toFixed(1)} ms/piece`);
+// census: Edition 2 keeps the first draft at ~97.7% of addresses (lab, 1..20,000)
+const firstShare = firstDraft / Math.max(ok, 1);
+console.log(`census: first draft kept at ${(100 * firstShare).toFixed(1)}% of addresses, ` +
+            `${(drafts / Math.max(ok, 1)).toFixed(2)} drafts per piece`);
+if (firstShare < 0.9) { console.log('CENSUS FAILED: fewer than 90% of addresses keep their first draft'); process.exitCode = 1; }
+if (failed) process.exitCode = 1;
 console.log(`avg warnings ${(warnings/ok).toFixed(2)} | chromatic voice-lines ${chrom} | ` +
             `${(ornaments/ok).toFixed(1)} ornaments/piece (${slots/ok|0} slots avg)`);
 const tot = Object.values(intervals).reduce((a,b)=>a+b,0);
