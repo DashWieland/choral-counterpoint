@@ -180,12 +180,14 @@ Measured over addresses 1 to 3,000 with Edition 2's rules:
 **Listening examples**, addresses 1 to 4 (not cherry-picked), in `docs/engine-review/examples/`:
 - `shipped-000N.mid` is what `?piece=N` plays today.
 - `barform-000N.mid` is the same address under Edition 2's rules with the bar-form planner.
+- `plain-varied-000N.mid` and `plain-literal-000N.mid` are those bar-form pieces without ornaments, with the Stollen repeat re-harmonized or copied.
 - `barform-sopranos.txt` lists every tune with its phrases lettered.
 
 **The repeat, as built.**
 - The bass search carries on from the Stollen's last chord into the repeat, so 96% of repeats get a new harmonization, with about half the chords changed.
 - Many of Bach's four-part settings write the Stollen once under a repeat sign. He does re-harmonize a repeated Stollen elsewhere, for example in the chorale chorus of BWV 114.
-- Harmonizing it once and copying it would make the form audible. The decision table has this row.
+- **Copying works everywhere.** Copying the first statement's harmony into the repeat passes the checker in all 3,000 pieces tested (`barform-literal.mjs`). It adds 0.42 warnings per piece, at the two phrase breaks where the copy joins the rest.
+- So a literal repeat is purely a musical choice; the decision table has this row. `plain-varied-000N.mid` and `plain-literal-000N.mid` are the same four pieces without ornaments, differing only in the repeat's harmony.
 
 **Limits of the prototype.**
 - No motivic link between Stollen and Abgesang, no text rhythm, and no key plan beyond cadence degrees.

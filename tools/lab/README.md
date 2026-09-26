@@ -31,6 +31,6 @@ The flags are listed at the top of `engine.lab.mjs`. The other scripts reproduce
 - `crowding.mjs`: the bass meeting the soprano in failed drafts.
 - `settings.mjs` and `diverse.mjs`: alternative settings of one tune.
 - `log1p_check.mjs`: browser maths. Run it against the frozen table and it reports no change.
-- `barform.mjs`, `barform-run.mjs` and `barform-examples.mjs`: the bar-form melody planner.
+- `barform.mjs`, `barform-run.mjs` and `barform-examples.mjs`: the bar-form melody planner. `barform-literal.mjs` tests a literal Stollen repeat.
 
 A promoted change must reproduce the lab's pieces address for address, as `engine.js` did for Edition 2.
