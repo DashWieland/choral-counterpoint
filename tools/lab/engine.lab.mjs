@@ -21,6 +21,19 @@
 //   innerRules   the inner voices never leap a seventh or more than an octave,
 //                nor move by an augmented second, at fermatas too (the JS
 //                harmonizer wrote what its own surface gate then rejected)
+//   splitmixSeed Edition 2's seeding: key, mode and phrase count from
+//                splitmix64(n*64), draft a from splitmix64(n*64 + 1 + a)
+//   literalRepeat with a bar-form planner (flags.melodyFn returning a form),
+//                the Stollen's repeat copies its first statement: inside the
+//                repeat the bass and inner-voice searches may only repeat
+//                what each line wrote there, and ornaments are mirrored; at the
+//                Stollen's last chord a line must be able to start over
+//   joinFree     with literalRepeat, the move from the Stollen's end back to
+//                its start needs no precedent in the oracle (a repeat starts
+//                over after a breath), only the hard rules within an octave
+//   endLookahead at the next-to-last chord a bass line must be able to reach
+//                a tonic the search may write (tonicEnd made the beam die there)
+//   bassWidth, innerWidth  beam widths (10 and 14 when unset)
 //
 // The engine itself is untouched; nothing here changes a live ?piece=N.
 
@@ -30,6 +43,11 @@ const { TABLES } = await import('../../instrument/web/tables-ed1.js')
 
 let FL = {};                      // active flags for the current composePieceLab
 let TRACE = null;                 // per-attempt stage log when tracing
+let REP = 0;                      // literalRepeat: chords in the Stollen (0 = off)
+let DIED_AT = -1;                 // the chord where the last bass or inner beam emptied
+// counters for diagnostics (why a line could not return to the Stollen, ...)
+export const LAB_STATS = { joinWhy: {}, endWhy: {} };
+const tally = (h, k) => { h[k] = (h[k] || 0) + 1; };
 
 const ORACLE = TABLES.outer_voice_table;
 const MELODY = TABLES.melody_table;
@@ -465,6 +483,47 @@ function bassLine(sop, fermatas, tonicPc, mode, rng, beamWidth = 10, temp = 0) {
   const pairs = PAIRS[mode];
   const scale = SCALES[mode];
   const opens = ORACLE.openings[`${mode}|${rel(sop[0])}`] || { '0': 1 };
+  // what the inner-voice search and the checker would reject anyway, refused
+  // where the notes are written: bass note cand at chord i after prev
+  const legal = (i, prev, cand, tPc) => {
+    const a = Math.abs(cand - prev);
+    if (a === 10 || a === 11) return false;
+    // (lab) checked after the rng draw so the random stream stays aligned
+    // with the shipped engine
+    if (FL.sbParallel && pairParallel(sop[i - 1], prev, sop[i], cand)) return false;
+    if (FL.tonicEnd && i === n - 1 && mod12(cand) !== tonicPc) return false;
+    // bassSpace: never within a minor third of the soprano (the range lets
+    // the bass climb to D4 while the soprano can sit on C4, and a bass that
+    // close leaves no room for alto and tenor)
+    if (FL.bassSpace && sop[i] - cand <= 3) return false;
+    if (FL.bassAug2 && mode === 'minor' && a === 3 && !ferm.has(i)) {
+      const r2 = new Set([rel(prev), tPc]);
+      if (r2.has(8) && r2.has(11)) return false;
+    }
+    return true;
+  };
+  // (lab) literalRepeat: can a Stollen ending on bass note last go back to
+  // the first bass note b0? The search will have to write that move.
+  const returns = (last, b0) => {
+    const i = REP, tPc = rel(b0), W = LAB_STATS.joinWhy;
+    if (!FL.joinFree) {
+      const moves = oracleMoves(mode, rel(sop[i - 1]), rel(sop[i]), ferm.has(i + 1) || i === n - 1 ? 1 : 0, rel(last));
+      if (moves[tPc] === undefined) { tally(W, 'oracle'); return false; }
+      if (!concretize(mod12(b0), last).slice(0, 2).includes(b0)) { tally(W, 'octave'); return false; }
+    } else if (Math.abs(b0 - last) > 12) { tally(W, 'beyond an octave'); return false; }
+    if (!legal(i, last, b0, tPc)) { tally(W, 'rules'); return false; }
+    return true;
+  };
+  // (lab) endLookahead: can a line at the penultimate chord still reach a
+  // tonic the search is allowed to write?
+  const reachesTonic = prev => {
+    const i = n - 1, W = LAB_STATS.endWhy;
+    const moves = oracleMoves(mode, rel(sop[i - 1]), rel(sop[i]), 1, rel(prev));
+    if (moves[0] === undefined || !pairs.has(rel(sop[i]) * 12)) { tally(W, 'oracle'); return false; }
+    for (const cand of concretize(tonicPc, prev).slice(0, 2)) if (legal(i, prev, cand, 0)) return true;
+    tally(W, 'rules');
+    return false;
+  };
   let beams = [];
   for (const [p, c] of Object.entries(opens).sort((a, b) => b[1] - a[1]).slice(0, 6)) {
     if (!pairs.has(rel(sop[0]) * 12 + Number(p))) continue;
@@ -477,32 +536,31 @@ function bassLine(sop, fermatas, tonicPc, mode, rng, beamWidth = 10, temp = 0) {
     const nxt = [];
     for (const [score, line] of beams) {
       const prev = line[line.length - 1];
+      // (lab) literalRepeat: inside the Stollen's repeat a line repeats itself
+      const fixed = REP && i >= REP && i < 2 * REP ? line[i - REP] : null;
+      if (fixed !== null && i === REP && FL.joinFree) {
+        // (lab) joinFree: the repeat starts over; its first bass note is
+        // written as it stands, under the hard rules only
+        if (Math.abs(fixed - prev) <= 12 && legal(i, prev, fixed, rel(fixed)))
+          nxt.push([score + uniform(rng, 0, temp), line.concat([fixed])]);
+        continue;
+      }
       const moves = oracleMoves(mode, rel(sop[i - 1]), rel(sop[i]), cad, rel(prev));
       for (const [tPcS, cnt] of Object.entries(moves)) {
         const tPc = Number(tPcS);
         if (!pairs.has(rel(sop[i]) * 12 + tPc)) continue;
         const absPc = mod12(tPc + tonicPc);
         for (const cand of concretize(absPc, prev).slice(0, 2)) {
+          if (fixed !== null && cand !== fixed) continue;
           let s = score + Math.log1p(cnt) + uniform(rng, 0, temp);
           const dm = cand - prev, ds = sop[i] - sop[i - 1];
           if (dm === 0 && ds === 0) s -= 0.2;
           if ((dm < 0 && ds > 0) || (ds < 0 && dm > 0)) s += 0.6;
           else if (dm === 0 || ds === 0) s += 0.2;
           const a = Math.abs(dm);
-          if (a === 10 || a === 11) continue;
-          // (lab) rules the inner-voice search and the checker enforce, applied
-          // where the notes are written; checked after the rng draw so the
-          // random stream stays aligned with the shipped engine
-          if (FL.sbParallel && pairParallel(sop[i - 1], prev, sop[i], cand)) continue;
-          if (FL.tonicEnd && i === n - 1 && mod12(cand) !== tonicPc) continue;
-          // bassSpace: never within a minor third of the soprano (the range
-          // lets the bass climb to D4 while the soprano can sit on C4, and a
-          // bass that close leaves no room for alto and tenor)
-          if (FL.bassSpace && sop[i] - cand <= 3) continue;
-          if (FL.bassAug2 && mode === 'minor' && a === 3 && !ferm.has(i)) {
-            const r2 = new Set([rel(prev), tPc]);
-            if (r2.has(8) && r2.has(11)) continue;
-          }
+          if (!legal(i, prev, cand, tPc)) continue;
+          if (REP && i === REP - 1 && !returns(cand, line[0])) continue;
+          if (FL.endLookahead && i === n - 2 && !reachesTonic(cand)) continue;
           if (a === 6) s -= 1.0;
           s += (a === 1 || a === 2) ? 0.5 : a <= 4 ? 0.2 : a <= 7 ? 0.05 : -0.5;
           if (!scale.has(tPc) && a === 3) s -= 2.0;
@@ -521,7 +579,7 @@ function bassLine(sop, fermatas, tonicPc, mode, rng, beamWidth = 10, temp = 0) {
     }
     nxt.sort((a, b) => b[0] - a[0]);
     beams = nxt.slice(0, beamWidth);
-    if (!beams.length) return null;
+    if (!beams.length) { DIED_AT = i; return null; }
   }
   return FL._allBeams ? beams.map(b => b[1]) : beams[0][1];
 }
@@ -583,6 +641,34 @@ function harmonize(sop, bass, fermatas, tonicPc, mode, beamWidth = 14) {
     if (!opts.length) return null;
     slots.push(opts);
   }
+  // may alto and tenor move from pa, pt to a, t into chord i? (the hard rules)
+  const legal = (i, pa, pt, a, t) => {
+    const qp = [sop[i - 1], pa, pt, bass[i - 1]], qc = [sop[i], a, t, bass[i]];
+    for (let x = 0; x < 4; x++)
+      for (let y = x + 1; y < 4; y++)
+        if (pairParallel(qp[x], qp[y], qc[x], qc[y])) return false;
+    if (FL.innerRules) {
+      // (lab) one rule for the inner voices, everywhere (fermatas too):
+      // no leap of a seventh or more than an octave (the checker's rule)
+      // and no augmented second (Python's rule: b6/#7, or a chromatic end)
+      for (const [pp, cp] of [[pa, a], [pt, t]]) {
+        const d = Math.abs(cp - pp);
+        if (d === 10 || d === 11 || d > 12) return false;
+        if (d === 3) {
+          const r1 = mod12(pp - tonicPc), r2 = mod12(cp - tonicPc);
+          if ((r1 === 8 && r2 === 11) || (r1 === 11 && r2 === 8) || !scale.has(r1) || !scale.has(r2)) return false;
+        }
+      }
+    } else if (mode === 'minor' && !fermSet.has(i)) {
+      for (const [pp, cp] of [[pa, a], [pt, t]]) {
+        if (Math.abs(cp - pp) === 3) {
+          const rel2 = new Set([mod12(pp - tonicPc), mod12(cp - tonicPc)]);
+          if (rel2.has(8) && rel2.has(11)) return false;
+        }
+      }
+    }
+    return true;
+  };
   let beams = slots[0].slice().sort((x, y) => x[3] - y[3]).slice(0, beamWidth)
     .map(([a, t, ci, c]) => [-c, [[a, t, ci]]]);
   for (let i = 1; i < n; i++) {
@@ -593,36 +679,16 @@ function harmonize(sop, bass, fermatas, tonicPc, mode, beamWidth = 14) {
       const plt = pch.lt !== null ? abspc(pch.lt) : null;
       const psev = pch.seventh !== null ? abspc(pch.seventh) : null;
       const ptarget = pch.target !== null ? abspc(pch.target) : null;
+      // (lab) literalRepeat: inside the Stollen's repeat a line repeats itself
+      const fixed = REP && i >= REP && i < 2 * REP ? line[i - REP] : null;
       for (const [a, t, ci, cost] of slots[i]) {
+        if (fixed && (a !== fixed[0] || t !== fixed[1] || ci !== fixed[2])) continue;
         const ch = vocab[ci];
         const curPcs = new Set(ch.pcs.map(abspc));
         const targetMissed = ptarget !== null && !curPcs.has(ptarget);
-        let bad = false;
         const qp = [sop[i - 1], pa, pt, bass[i - 1]], qc = [sop[i], a, t, bass[i]];
-        for (let x = 0; x < 4 && !bad; x++)
-          for (let y = x + 1; y < 4; y++)
-            if (pairParallel(qp[x], qp[y], qc[x], qc[y])) { bad = true; break; }
-        if (!bad && FL.innerRules) {
-          // (lab) one rule for the inner voices, everywhere (fermatas too):
-          // no leap of a seventh or more than an octave (the checker's rule)
-          // and no augmented second (Python's rule: b6/#7, or a chromatic end)
-          for (const [pp, cp] of [[pa, a], [pt, t]]) {
-            const d = Math.abs(cp - pp);
-            if (d === 10 || d === 11 || d > 12) bad = true;
-            if (d === 3) {
-              const r1 = mod12(pp - tonicPc), r2 = mod12(cp - tonicPc);
-              if ((r1 === 8 && r2 === 11) || (r1 === 11 && r2 === 8) || !scale.has(r1) || !scale.has(r2)) bad = true;
-            }
-          }
-        } else if (!bad && mode === 'minor' && !fermSet.has(i)) {
-          for (const [pp, cp] of [[pa, a], [pt, t]]) {
-            if (Math.abs(cp - pp) === 3) {
-              const rel2 = new Set([mod12(pp - tonicPc), mod12(cp - tonicPc)]);
-              if (rel2.has(8) && rel2.has(11)) bad = true;
-            }
-          }
-        }
-        if (bad) continue;
+        if (!legal(i, pa, pt, a, t)) continue;
+        if (REP && i === REP - 1 && !legal(REP, a, t, line[0][0], line[0][1])) continue;
         let s = score - cost;
         if (targetMissed) s -= 3.0;
         s -= 0.25 * (Math.abs(a - pa) + Math.abs(t - pt));
@@ -655,7 +721,7 @@ function harmonize(sop, bass, fermatas, tonicPc, mode, beamWidth = 14) {
     }
     nxt.sort((a, b) => b[0] - a[0]);
     beams = nxt.slice(0, beamWidth);
-    if (!beams.length) return null;
+    if (!beams.length) { DIED_AT = i; return null; }
   }
   return beams[0][1].map(([a, t]) => [a, t]);
 }
@@ -665,6 +731,7 @@ function harmonize(sop, bass, fermatas, tonicPc, mode, beamWidth = 14) {
 // score only depends on the previous and current (alto, tenor, chord) state,
 // so dynamic programming finds the true best path, or proves none exists.
 function harmonizeExact(sop, bass, fermatas, tonicPc, mode) {
+  if (REP) throw new Error('exactInner cannot copy the Stollen: the copy depends on the path');
   const n = sop.length;
   const vocab = CHORDS[mode];
   const scale = SCALES[mode];
@@ -819,13 +886,23 @@ function ornament(skel, tonicPc, mode, fermatas, density, rng) {
     return { V, noise };
   };
 
+  // (lab) literalRepeat: an ornament in the Stollen is written into its
+  // repeat too, and the repeat's own slots are never drawn for
+  const mirror = i => REP && i >= REP && i < 2 * REP;
   const tryApply = (vn, slotIdx, newSlot) => {
-    const old = events[vn][slotIdx];
+    const twin = REP && slotIdx < REP ? slotIdx + REP : -1;
+    const old = events[vn][slotIdx], oldTwin = twin >= 0 ? events[vn][twin] : null;
     const before = noiseOf(build()).noise;
     events[vn][slotIdx] = newSlot;
+    if (twin >= 0) events[vn][twin] = newSlot;
     const { V, noise } = noiseOf(build());
-    if (V.length || noise > before) { events[vn][slotIdx] = old; return false; }
+    if (V.length || noise > before) {
+      events[vn][slotIdx] = old;
+      if (twin >= 0) events[vn][twin] = oldTwin;
+      return false;
+    }
     claimed[vn][slotIdx] = true;
+    if (twin >= 0) claimed[vn][twin] = true;
     return true;
   };
 
@@ -833,7 +910,7 @@ function ornament(skel, tonicPc, mode, fermatas, density, rng) {
   for (const vn of ['s', 'a', 't']) {
     const p = rate('suspensions', ORN_VOICE[vn], 'sus', 'opportunity');
     for (let i = 1; i < n; i++) {
-      if (claimed[vn][i] || claimed[vn][i - 1] || fermSet.has(i + 1)) continue;
+      if (claimed[vn][i] || claimed[vn][i - 1] || fermSet.has(i + 1) || mirror(i)) continue;
       const prev = skel[vn][i - 1], cur = skel[vn][i];
       if (!(prev - cur >= 1 && prev - cur <= 2)) continue;
       const iv = mod12(prev - skel.b[i]);
@@ -845,7 +922,7 @@ function ornament(skel, tonicPc, mode, fermatas, density, rng) {
   // passing tones
   for (const vn of ['b', 't', 'a', 's']) {
     for (let i = 0; i < n - 1; i++) {
-      if (claimed[vn][i] || fermSet.has(i + 1)) continue;
+      if (claimed[vn][i] || fermSet.has(i + 1) || mirror(i)) continue;
       const x = skel[vn][i], z = skel[vn][i + 1];
       if (Math.abs(z - x) !== 3 && Math.abs(z - x) !== 4) continue;
       const mid = diatonicBetween(x, z, scaleAbs);
@@ -860,7 +937,7 @@ function ornament(skel, tonicPc, mode, fermatas, density, rng) {
   for (const vn of ['b', 'a', 't', 's']) {
     const p = rate('neighbors', ORN_VOICE[vn], 'neighbor', 'plain');
     for (let i = 0; i < n - 1; i++) {
-      if (claimed[vn][i] || fermSet.has(i + 1)) continue;
+      if (claimed[vn][i] || fermSet.has(i + 1) || mirror(i)) continue;
       if (skel[vn][i] !== skel[vn][i + 1]) continue;
       const nb = diatonicBelow(skel[vn][i], scaleAbs);
       if (nb === null) continue;
@@ -872,7 +949,7 @@ function ornament(skel, tonicPc, mode, fermatas, density, rng) {
   const pAnt = rate('anticipations', 'soprano', 'ant', 'plain');
   for (const f of fermatas) {
     const i = f - 2;
-    if (i < 0 || claimed.s[i]) continue;
+    if (i < 0 || claimed.s[i] || mirror(i)) continue;
     const x = skel.s[i], z = skel.s[i + 1];
     if (Math.abs(x - z) >= 1 && Math.abs(x - z) <= 2 && rng() < Math.min(1, pAnt * density * 4))
       tryApply('s', i, [[x, 1], [z, 1]]);
@@ -928,20 +1005,36 @@ export function composePiece(pieceNumber, density = 1.0) {
 
 // ------------------------------------------------------------------ lab --
 
+// (lab) splitmixSeed: Edition 2's seeds, an integer hash of the address
+const M64 = (1n << 64n) - 1n;
+function splitmix64(x) {
+  x = (x + 0x9E3779B97F4A7C15n) & M64;
+  let z = x;
+  z = ((z ^ (z >> 30n)) * 0xBF58476D1CE4E5B9n) & M64;
+  z = ((z ^ (z >> 27n)) * 0x94D049BB133111EBn) & M64;
+  return z ^ (z >> 31n);
+}
+const seedOf = (n, stream) =>
+  Number(splitmix64(BigInt(Math.floor(n)) * 64n + BigInt(stream)) & 0xFFFFFFFFn);
+
 // composePieceLab(n, flags, trace): composePiece with the review's flags.
 // trace (optional array) receives one record per draft:
 //   { attempt, bassTry, stage: 'bass'|'inner'|'checker'|'surface'|'kept', V? }
 export function composePieceLab(pieceNumber, flags = {}, trace = null, density = 1.0) {
   FL = flags;
   try {
-    const paramRng = mulberry32(pieceNumber * 2654435761 + 1);
+    const paramRng = mulberry32(flags.splitmixSeed ? seedOf(pieceNumber, 0) : pieceNumber * 2654435761 + 1);
     const [tonicName, tonicPc] = choice(paramRng, KEYS);
     const mode = paramRng() < 0.45 ? 'minor' : 'major';
     const phrases = choice(paramRng, [2, 3, 3, 4]);
     const melodyFn = flags.melodyFn || melody;
     for (let attempt = 0; attempt < 40; attempt++) {
-      const rng = mulberry32(pieceNumber * 1000 + attempt * 7 + 13);
-      const { pitches: sop, fermatas } = melodyFn(tonicPc, mode, phrases, rng);
+      const rng = mulberry32(flags.splitmixSeed ? seedOf(pieceNumber, attempt + 1)
+        : pieceNumber * 1000 + attempt * 7 + 13);
+      const mel = melodyFn(tonicPc, mode, phrases, rng);
+      if (!mel) { if (trace) trace.push({ attempt, bassTry: 0, stage: 'melody' }); continue; }
+      const { pitches: sop, fermatas } = mel;
+      REP = flags.literalRepeat && mel.form ? mel.form.stollenChords : 0;
       if (sop.some(x => x === undefined)) {       // the shipped planner can emit these
         if (trace) trace.push({ attempt, bassTry: 0, stage: 'bass', undef: true });
         continue;
@@ -949,19 +1042,25 @@ export function composePieceLab(pieceNumber, flags = {}, trace = null, density =
       let basses;
       if (flags.bassFallback) {
         FL = { ...flags, _allBeams: true };
-        basses = bassLine(sop, fermatas, tonicPc, mode, rng, 10, 0.15 * attempt);
+        basses = bassLine(sop, fermatas, tonicPc, mode, rng, flags.bassWidth || 10, 0.15 * attempt);
         FL = flags;
       } else {
-        const b = bassLine(sop, fermatas, tonicPc, mode, rng, 10, 0.15 * attempt);
+        const b = bassLine(sop, fermatas, tonicPc, mode, rng, flags.bassWidth || 10, 0.15 * attempt);
         basses = b ? [b] : null;
       }
-      if (!basses) { if (trace) trace.push({ attempt, bassTry: 0, stage: 'bass' }); continue; }
+      if (!basses) {
+        if (trace) trace.push({ attempt, bassTry: 0, stage: 'bass', at: DIED_AT, rep: REP, fermatas });
+        continue;
+      }
       for (let bi = 0; bi < basses.length; bi++) {
         const bass = basses[bi];
         const inner = flags.exactInner
           ? harmonizeExact(sop, bass, fermatas, tonicPc, mode)
-          : harmonize(sop, bass, fermatas, tonicPc, mode);
-        if (!inner) { if (trace) trace.push({ attempt, bassTry: bi, stage: 'inner' }); continue; }
+          : harmonize(sop, bass, fermatas, tonicPc, mode, flags.innerWidth || 14);
+        if (!inner) {
+          if (trace) trace.push({ attempt, bassTry: bi, stage: 'inner', at: DIED_AT, rep: REP, fermatas });
+          continue;
+        }
         const skel = { s: sop, a: inner.map(x => x[0]), t: inner.map(x => x[1]), b: bass };
         const { V, W } = checkChorale(skel, tonicPc, mode, fermatas);
         if (V.length) { if (trace) trace.push({ attempt, bassTry: bi, stage: 'checker', V }); continue; }
@@ -979,12 +1078,14 @@ export function composePieceLab(pieceNumber, flags = {}, trace = null, density =
           events, skeleton: skel, fermatas,
           fermataEighths: fermatas.map(f => 2 * (f - 1)),
           totalEighths: total, violations: 0, warnings: W.length, W, attempt, bassTry: bi,
+          form: mel.form,
         };
       }
     }
     return null;
   } finally {
     FL = {};
+    REP = 0;
   }
 }
 

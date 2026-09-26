@@ -1,6 +1,7 @@
 // Measure a melody planner over addresses 1..N with the review's fix flags
 // and write results/barform-<name>.json. Adapted from run.mjs.
 //   node --no-warnings barform-run.mjs <shipped|barform> [N=3000] [workers=8] [name] [extra,flags]
+// An extra item written key=value sets a planner option (BARFORM_OPTS).
 // Everything downstream of the melody (bass beam search, inner voices,
 // checker, ornaments, surface checker) is the lab engine, unchanged.
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
@@ -13,19 +14,24 @@ const STAGE_RANK = { bass: 0, inner: 1, checker: 2, surface: 3, kept: 4 };
 
 if (isMainThread) {
   const [planner = 'barform', Nstr = '3000', Wstr = '8', nameArg, extraStr = ''] = process.argv.slice(2);
-  const extra = extraStr.split(',').filter(Boolean);
-  const N = Number(Nstr), W = Math.min(8, Number(Wstr));
+  const items = extraStr.split(',').filter(Boolean);
+  const extra = items.filter(x => !x.includes('='));
+  const opts = Object.fromEntries(items.filter(x => x.includes('=')).map(x => {
+    const [k, v] = x.split('=');
+    return [k, v === 'true' ? true : v === 'false' ? false : Number(v)];
+  }));
+  const N = Number(Nstr), W = Math.min(16, Number(Wstr));
   const name = nameArg || planner;
   const t0 = Date.now();
   const parts = await Promise.all(Array.from({ length: W }, (_, w) => new Promise((res, rej) => {
-    const wk = new Worker(new URL(import.meta.url), { workerData: { w, W, N, planner, extra } });
+    const wk = new Worker(new URL(import.meta.url), { workerData: { w, W, N, planner, extra, opts } });
     wk.on('message', res); wk.on('error', rej);
   })));
   const rows = parts.flat().sort((a, b) => a.n - b.n);
   const kept = rows.filter(r => r.ok);
   const sum = (xs, f) => xs.reduce((a, x) => a + f(x), 0);
   const agg = {
-    name, planner, flags: [...FIXES, ...extra], N,
+    name, planner, flags: [...FIXES, ...extra], opts, N,
     nulls: rows.length - kept.length,
     meanAttempts: sum(rows, r => r.attempts) / N,
     meanTries: sum(rows, r => r.tries) / N,
@@ -36,6 +42,8 @@ if (isMainThread) {
     chordsHist: {},
     stages: {}, failedAttemptStage: {}, violations: {},
     sop: { rep: 0, step: 0, third: 0, fourth: 0, fifth: 0, sixth: 0, larger: 0, n: 0 },
+    sopIn: { rep: 0, step: 0, third: 0, fourth: 0, fifth: 0, sixth: 0, larger: 0, n: 0 },
+    sopB: { rep: 0, step: 0, third: 0, fourth: 0, fifth: 0, sixth: 0, larger: 0, n: 0 },
     meanAmbitus: sum(kept, r => r.ambitus) / kept.length,
     ambitusHist: {},
     lowest: Math.min(...kept.map(r => r.lo)), highest: Math.max(...kept.map(r => r.hi)),
@@ -56,6 +64,8 @@ if (isMainThread) {
   }
   for (const r of kept) {
     for (const [k, v] of Object.entries(r.sop)) agg.sop[k] += v;
+    for (const [k, v] of Object.entries(r.sopIn)) agg.sopIn[k] += v;
+    for (const [k, v] of Object.entries(r.sopB)) agg.sopB[k] += v;
     for (const k of r.warnKeys) agg.warnings[k] = (agg.warnings[k] || 0) + 1;
     const cb = Math.floor(r.chords / 10) * 10;
     agg.chordsHist[cb] = (agg.chordsHist[cb] || 0) + 1;
@@ -98,6 +108,9 @@ if (isMainThread) {
     `harmonization tries ${agg.meanTries.toFixed(3)} | first attempt kept ${pct(agg.firstAttemptShare)}, first try kept ${pct(agg.firstTryShare)}`);
   console.log(`  chords/piece ${agg.meanChords.toFixed(1)} | soprano: step ${pct(s.step / s.n)}, rep ${pct(s.rep / s.n)}, third ${pct(s.third / s.n)}, ` +
     `fourth ${pct(s.fourth / s.n)}, fifth ${pct(s.fifth / s.n)}, sixth ${pct(s.sixth / s.n)}, larger ${pct(s.larger / s.n)}`);
+  for (const [lab, h] of [['inside phrases', agg.sopIn], ['phrase to phrase', agg.sopB]])
+    console.log(`    ${lab}: step ${pct(h.step / h.n)}, rep ${pct(h.rep / h.n)}, third ${pct(h.third / h.n)}, fourth ${pct(h.fourth / h.n)}, ` +
+      `fifth ${pct(h.fifth / h.n)}, sixth ${pct(h.sixth / h.n)}, larger ${pct(h.larger / h.n)} (n=${h.n})`);
   console.log(`  ambitus mean ${agg.meanAmbitus.toFixed(2)} st, lowest ${agg.lowest}, highest ${agg.highest}, mean pitch ${agg.meanPitch.toFixed(1)}, ` +
     `'s out of range' pieces ${agg.sopOutOfRangePieces}`);
   console.log(`  warnings/piece ${agg.warningsPerPiece.toFixed(3)} (${agg.warningsPer10Chords.toFixed(3)} per 10 chords), pieces with any ${agg.warnPieces}`);
@@ -109,10 +122,12 @@ if (isMainThread) {
     `reprise (n=${agg.reprise.pieces}) same bass ${pct(agg.reprise.sameBass)}, same SATB ${pct(agg.reprise.sameSkeleton)}`);
 } else {
   const E = await import('./engine.lab.mjs');
-  const { barformMelody } = await import('./barform.mjs');
-  const { w, W, N, planner, extra } = workerData;
+  const { barformMelody, BARFORM_OPTS } = await import('./barform.mjs');
+  const { w, W, N, planner, extra, opts } = workerData;
+  Object.assign(BARFORM_OPTS, opts);
   const flags = {};
   for (const f of [...FIXES, ...extra]) flags[f] = true;
+  Object.assign(flags, opts);          // numeric knobs (bassWidth, innerWidth) reach the lab too
   if (planner === 'barform') flags.melodyFn = barformMelody;
   const out = [];
   const fnv = s => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); } return h >>> 0; };
@@ -142,11 +157,13 @@ if (isMainThread) {
     if (p) {
       const s = p.skeleton.s, ferm = new Set(p.fermatas);
       r.chords = s.length;
-      r.sop = { rep: 0, step: 0, third: 0, fourth: 0, fifth: 0, sixth: 0, larger: 0, n: 0 };
+      const blank = () => ({ rep: 0, step: 0, third: 0, fourth: 0, fifth: 0, sixth: 0, larger: 0, n: 0 });
+      r.sop = blank(); r.sopIn = blank(); r.sopB = blank();
       for (let i = 1; i < s.length; i++) {
         const a = Math.abs(s[i] - s[i - 1]);
-        r.sop[a === 0 ? 'rep' : a <= 2 ? 'step' : a <= 4 ? 'third' : a === 5 ? 'fourth' : a === 7 ? 'fifth' : a <= 9 ? 'sixth' : 'larger']++;
-        r.sop.n++;
+        const k = a === 0 ? 'rep' : a <= 2 ? 'step' : a <= 4 ? 'third' : a === 5 ? 'fourth' : a === 7 ? 'fifth' : a <= 9 ? 'sixth' : 'larger';
+        const where = ferm.has(i) ? r.sopB : r.sopIn;
+        r.sop[k]++; r.sop.n++; where[k]++; where.n++;
       }
       r.lo = Math.min(...s); r.hi = Math.max(...s); r.ambitus = r.hi - r.lo;
       r.meanPitch = s.reduce((a, b) => a + b, 0) / s.length;
@@ -156,10 +173,7 @@ if (isMainThread) {
       r.sopKey = p.key + '|' + s.join(',');
       r.pieceHash = fnv(p.key + JSON.stringify(p.events));
       if (planner === 'barform') {
-        const rng = E.mulberry32(n * 1000 + p.attempt * 7 + 13);
-        const mel = barformMelody(p.tonicPc, p.mode, p.phrases, rng);
-        if (mel.pitches.join() !== s.join()) throw new Error(`No. ${n}: melody regeneration mismatch`);
-        const f = mel.form, L = f.stollenChords, sk = p.skeleton;
+        const f = p.form, L = f.stollenChords, sk = p.skeleton;
         const same = (v, a, b, len) => { for (let i = 0; i < len; i++) if (sk[v][a + i] !== sk[v][b + i]) return false; return true; };
         let diffChords = 0, firstDiff = -1;
         for (let i = 0; i < L; i++) {

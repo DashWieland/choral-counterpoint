@@ -1,7 +1,7 @@
 // Measure one flag set over addresses 1..N in parallel and write
 // results/<name>.json. Usage:
 //   node --no-warnings run.mjs <name> [flag,flag,...] [N=20000] [workers=20]
-// Flags: sbParallel bassAug2 seamFix formulaFit register exactInner bassFallback
+// Flags: those listed in engine.lab.mjs, plus barform (the bar-form planner)
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { writeFileSync, mkdirSync } from 'node:fs';
 
@@ -52,6 +52,8 @@ if (isMainThread) {
 } else {
   const { composePieceLab } = await import('./engine.lab.mjs');
   const { lo, hi, flags } = workerData;
+  // functions can't cross into a worker: 'barform' names the bar-form planner
+  if (flags.barform) flags.melodyFn = (await import('./barform.mjs')).barformMelody;
   const r = { lo, nulls: 0, drafts: 0, firstDraft: 0, stages: {}, maxDrafts: 0, maxAt: 0,
     warnPieces: 0, warnings: {}, lastNotTonic: 0, sopRange: 0, byKey: {}, undef: 0, bassTryUsed: 0, hashes: [], tunesDiscarded: 0, firstTune: 0, lastBassNotTonic: 0 };
   for (let n = lo; n <= hi; n++) {

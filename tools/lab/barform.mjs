@@ -25,8 +25,15 @@
 // the formula is weighted too), times Bach's soprano degree profile
 // (ORACLE.arrivals), pulled toward the phrase's contour: an arch (a peak
 // inside the phrase), a descent from the opening, or an ascent into the
-// cadence. A randomized depth-first search with backtracking fills them, so
-// every hard rule below holds by construction.
+// cadence. Every legal completion of the free notes is enumerated (a phrase
+// has at most four) and one is drawn in proportion to the product of those
+// weights, so every hard rule below holds by construction. The prototype
+// filled them by a depth-first search instead, which fell back on whatever
+// was left after a dead end, mostly thirds and leaps: its tunes moved by a
+// third 14% of the time, against about 8% in Bach's (counted chord to chord
+// in the oracle's corpus); drawn this way, 11%. The opening note and an
+// arch's peak are also weighted by the distance they leave the free notes
+// to cover, so a phrase can mostly be walked by step.
 //
 // ONE CLIMAX. The tune's highest note is chosen first (the upper tonic,
 // ninth or tenth in an authentic tune; the upper fifth, sixth or octave in a
@@ -38,11 +45,11 @@
 // AMBITUS. Eb and F are authentic (tonic to tonic, a step below allowed);
 // G, A and Bb are plagal (the dominant below to the dominant above). C and D
 // end on the upper tonic (C5, D5) inside a frame from the sixth below it to
-// the third above: a final on C4 or D4 sits on the top notes of the bass's
-// range (the bass search reaches D4), where the bass can land in unison with
-// the soprano and leave the inner voices no room; that squeeze caused most
-// harmonization failures in both planners. For the same reason no cadence
-// note lies below Eb4 and no note below D4, so every tune sits inside D4-G5.
+// the third above. No cadence note lies below Eb4 and no note below D4, so
+// every tune sits inside D4-G5. Ending C and D tunes on C4 and D4 instead
+// (BARFORM_OPTS.lowCD, measured with the bass kept a third below the
+// soprano) loses first drafts in those keys (C 97% to 93%, D 98% to 94%)
+// and sets the whole choir about three semitones lower.
 //
 // REGISTER. Each phrase aims its cadence at a register: the Stollen starts
 // low, the climax phrase cadences a fourth or so under the climax, the last
@@ -84,7 +91,18 @@ const bucketOf = iv => iv === 0 ? 'rep'
   : (iv > 0 ? 'u' : 'd') + (Math.abs(iv) <= 2 ? '1' : Math.abs(iv) <= 4 ? '2' : '3');
 
 // counters for the measurement scripts (never read by the planner itself)
-export const BARFORM_STATS = { tunes: 0, phraseRetries: 0, restarts: 0, dfsNodes: 0 };
+export const BARFORM_STATS = { tunes: 0, phraseRetries: 0, restarts: 0, paths: 0 };
+// experiment knobs for the measurement scripts (the defaults are the planner)
+//   travel  semitones per interval a phrase's free notes may cover before the
+//           opening or peak that asks for more is weighted down (0 = off)
+//   lowCD   C and D tunes end on C4 and D4 (measured and not adopted)
+export const BARFORM_OPTS = { travel: 1.2, lowCD: false };
+// the weight of a choice that leaves d semitones to cover in k intervals
+const travelW = (d, k) => {
+  if (!BARFORM_OPTS.travel) return 1;
+  const excess = Math.max(0, d - BARFORM_OPTS.travel * k);
+  return Math.exp(-excess * excess / 2);
+};
 
 const pickW = (rng, pairs) => {
   const ok = pairs.filter(p => p[1] > 0);
@@ -107,10 +125,10 @@ function makeKey(tonicPc, mode) {
   const DEG = major ? [0, 2, 4, 5, 7, 9, 11] : [0, 2, 3, 5, 7, 8, 10];
   const deg = m => mod12(m - tonicPc);
   const T4 = 60 + tonicPc;
-  const frame = T4 <= 62 ? 'high' : T4 >= 67 ? 'plagal' : 'authentic';
+  const frame = T4 <= 62 ? (BARFORM_OPTS.lowCD ? 'authentic' : 'high') : T4 >= 67 ? 'plagal' : 'authentic';
   const T = frame === 'high' ? T4 + 12 : T4;       // the final: Eb4..Bb4, C5, D5
   const [lo, hi] = frame === 'high' ? [T - 8, T + 4] : frame === 'plagal' ? [T - 5, T + 7] : [T, T + 12];
-  const floor = Math.max(62, lo - 2);
+  const floor = Math.max(BARFORM_OPTS.lowCD ? 60 : 62, lo - 2);
   const window = [];
   for (let m = floor; m <= 79; m++) if (DEG.includes(deg(m))) window.push(m);
   const triads = major ? [[0, 4, 7], [7, 11, 2]] : [[0, 3, 7], [7, 11, 2], [7, 10, 2]];
@@ -146,7 +164,7 @@ function innerOK(K, a, b) {
   const d = Math.abs(b - a);
   return (d <= 5 || d === 7) && !K.aug2(a, b);
 }
-const CADENCE_FLOOR = 63;          // no fermata on C4-D4 (see AMBITUS)
+const cadenceFloor = () => BARFORM_OPTS.lowCD ? 60 : 63;   // no fermata on C4-D4 (see AMBITUS)
 const BOUNDARY_W = { 0: 4, 1: 4, 2: 4, 3: 2.2, 4: 2.2, 5: 1.5, 7: 1, 8: 0.5, 9: 0.5 };
 
 // chromatic degree -> the diatonic degree with the same letter
@@ -271,7 +289,7 @@ function placements(K, spec) {
         if (d === 6 || d > 7 || K.aug2(notes[j - 1], notes[j])) ok = false;
       }
       if (!ok) continue;
-      if (notes[2] < CADENCE_FLOOR) continue;
+      if (notes[2] < cadenceFloor()) continue;
       if (spec.finalSet && !spec.finalSet.some(([m]) => m === notes[2])) continue;
       if (spec.next && spec.next !== 'self' && !connectOK(K, notes[1], notes[2], spec.next)) continue;
       let w = count * Math.exp(-Math.abs(e0 - spec.center) / 5);
@@ -311,7 +329,8 @@ function composePhrase(K, spec, rng) {
     else s0c = s0c.filter(m => m <= top - 2);
     if (!s0c.length) continue;
     const s0 = pickW(rng, s0c.map(m => [m, K.opening(m) *
-      (spec.first ? (m <= K.lo + 7 ? 1 : 0.5) : BOUNDARY_W[Math.abs(m - spec.prevLast)])]));
+      (spec.first ? (m <= K.lo + 7 ? 1 : 0.5) : BOUNDARY_W[Math.abs(m - spec.prevLast)]) *
+      travelW(Math.abs(m - e0), F)]));
 
     // the peak of an arch
     let kp = null, P = null;
@@ -327,7 +346,8 @@ function composePhrase(K, spec, rng) {
         if (k >= F - 2 && twins.has(K.deg(pk))) continue;
         const rise = pk - Math.max(s0, e0);
         const w = (spec.climax !== null ? 1 : Math.exp(-((rise - 3) ** 2) / 4)) *
-                  (k === Math.round(F / 2) || k === Math.round((F - 1) / 2) ? 2 : 1);
+                  (k === Math.round(F / 2) || k === Math.round((F - 1) / 2) ? 2 : 1) *
+                  travelW(pk - s0, k) * travelW(pk - e0, F - k);
         opts.push([[pk, k], w]);
       }
       if (!opts.length) continue;
@@ -355,15 +375,17 @@ function composePhrase(K, spec, rng) {
   return null;
 }
 
+// The free notes: every completion that passes the checks, drawn in
+// proportion to the product of the weights. A phrase has at most four free
+// notes, so this is a few thousand paths at most.
 function fill(K, spec, notes, F, kp, P, ceilFree, strictBelow, twins, curve, rng) {
-  let budget = 300;
   const L = notes.length;
   const seq = k => k >= 0 ? notes[k] : (k === -1 ? spec.prevLast : null);
-  const ivInto = k => {                       // interval arriving at position k
+  const ivInto = k => {
     const a = seq(k - 1), b = seq(k);
     return a === null || a === undefined || b === null || b === undefined ? null : b - a;
   };
-  const repeatsBefore = j => {                 // repeated notes among notes[0..j-1]
+  const repeatsBefore = j => {
     let r = 0;
     for (let k = 1; k < j; k++) if (notes[k] === notes[k - 1]) r++;
     return r;
@@ -372,11 +394,11 @@ function fill(K, spec, notes, F, kp, P, ceilFree, strictBelow, twins, curve, rng
     const b = notes[j - 1];
     if (!innerOK(K, b, m)) return false;
     if (m === b) {
-      if (seq(j - 2) === m) return false;                           // three in a row
-      if (repeatsBefore(j) >= 1) return false;                     // one repeat per phrase line
+      if (seq(j - 2) === m) return false;
+      if (repeatsBefore(j) >= 1) return false;
     }
-    if (j >= 3 && m === notes[j - 2] && b === notes[j - 3] && m !== b) return false;   // x y x y
-    if (Math.abs(m - b) >= 3) {                                    // leaps per phrase line
+    if (j >= 3 && m === notes[j - 2] && b === notes[j - 3] && m !== b) return false;
+    if (Math.abs(m - b) >= 3) {
       let leaps = 0, big = 0;
       for (let k = 1; k < j; k++) {
         const d = Math.abs(notes[k] - notes[k - 1]);
@@ -385,34 +407,35 @@ function fill(K, spec, notes, F, kp, P, ceilFree, strictBelow, twins, curve, rng
       }
       if (leaps >= 2 || (Math.abs(m - b) >= 5 && big >= 1)) return false;
     }
-    const a = seq(j - 2);
-    return legalMotion(K, a, b, m, ivInto(j - 1), ivInto(j - 2));
+    return legalMotion(K, seq(j - 2), b, m, ivInto(j - 1), ivInto(j - 2));
   };
-  const rec = j => {
-    if (--budget < 0) return false;
-    BARFORM_STATS.dfsNodes++;
-    if (j === F) {                             // the seam into the cadence formula
-      const e0 = notes[F], e1 = notes[F + 1], e2 = notes[F + 2];
-      if (!ok(F, e0)) return false;
-      if (notes[F - 1] === e0 && e0 === e1) return false;
-      if (e1 === notes[F - 1] && e0 === notes[F - 2] && e0 !== e1) return false;   // x y x y
-      if (e2 === e0 && e1 === notes[F - 1] && e1 !== e2) return false;
-      let reps = 0;
-      for (let k = 1; k < L; k++) if (notes[k] === notes[k - 1]) reps++;
-      if (reps > 2) return false;
-      return legalMotion(K, notes[F - 1], e0, e1, e0 - notes[F - 1], ivInto(F - 1)) &&
-             legalMotion(K, e0, e1, e2, e1 - e0, e0 - notes[F - 1]);
+  const seamOK = () => {
+    const e0 = notes[F], e1 = notes[F + 1], e2 = notes[F + 2];
+    if (!ok(F, e0)) return false;
+    if (notes[F - 1] === e0 && e0 === e1) return false;
+    if (e1 === notes[F - 1] && e0 === notes[F - 2] && e0 !== e1) return false;
+    if (e2 === e0 && e1 === notes[F - 1] && e1 !== e2) return false;
+    let reps = 0;
+    for (let k = 1; k < L; k++) if (notes[k] === notes[k - 1]) reps++;
+    if (reps > 2) return false;
+    return legalMotion(K, notes[F - 1], e0, e1, e0 - notes[F - 1], ivInto(F - 1)) &&
+           legalMotion(K, e0, e1, e2, e1 - e0, e0 - notes[F - 1]);
+  };
+  const found = [], ws = [];
+  const rec = (j, w) => {
+    if (j === F) {
+      if (seamOK()) { found.push(notes.slice(1, F)); ws.push(w); }
+      return;
     }
     if (j === kp) {
-      if (!ok(j, P)) return false;
+      if (!ok(j, P)) return;
       notes[j] = P;
-      if (rec(j + 1)) return true;
+      rec(j + 1, w);
       notes[j] = null;
-      return false;
+      return;
     }
     const nextFixed = kp !== null && j < kp ? kp : F;
     const goal = nextFixed === kp ? P : notes[F];
-    const cands = [], ws = [];
     const p = ivInto(j - 1);
     const nearCadence = j >= F - 2;
     for (const m of K.window) {
@@ -423,28 +446,22 @@ function fill(K, spec, notes, F, kp, P, ceilFree, strictBelow, twins, curve, rng
       if (!ok(j, m)) continue;
       const iv = m - notes[j - 1];
       const dev = m - curve(j);
-      let w = corpusW(K.mode, j, L, p, iv) * Math.exp(-(dev * dev) / 24.5) *
+      let wm = corpusW(K.mode, j, L, p, iv) * Math.exp(-(dev * dev) / 24.5) *
         (DEGREE_PRIOR[K.mode][K.deg(m)] || 0.1);
       // the interval into a fixed note (the peak, or the cadence formula)
       // is part of the line too: weight it by the corpus as well
-      if (nextFixed === j + 1) w *= corpusW(K.mode, j + 1, L, iv, goal - m);
-      cands.push(m);
-      ws.push(w);
+      if (nextFixed === j + 1) wm *= corpusW(K.mode, j + 1, L, iv, goal - m);
+      notes[j] = m;
+      rec(j + 1, w * wm);
+      notes[j] = null;
     }
-    while (cands.length) {
-      let total = 0;
-      for (const w of ws) total += w;
-      let r = rng() * total, k = 0;
-      for (; k < cands.length - 1; k++) { r -= ws[k]; if (r <= 0) break; }
-      notes[j] = cands[k];
-      if (rec(j + 1)) return true;
-      if (budget < 0) break;
-      cands.splice(k, 1); ws.splice(k, 1);
-    }
-    notes[j] = null;
-    return false;
   };
-  return rec(1);
+  rec(1, 1);
+  BARFORM_STATS.paths += found.length;
+  if (!found.length) return false;
+  const pick = weightedChoice(rng, found, ws);
+  for (let j = 1; j < F; j++) notes[j] = pick[j - 1];
+  return true;
 }
 
 // ------------------------------------------------------------------ tune --
@@ -489,7 +506,7 @@ function tryTune(K, nPhrases, rng) {
   const cw = nNew === 3 ? [5, 4, reprise ? 2 : 1] : (reprise ? [6, 4] : [8, 2]);
   const climaxAt = pickW(rng, cw.map((w, i) => [i, w]));
 
-  const tonics = [[T, 2], [T + 12, 1]].filter(([m]) => m < Cx && m >= CADENCE_FLOOR && m <= K.hi + 2);
+  const tonics = [[T, 2], [T + 12, 1]].filter(([m]) => m < Cx && m >= cadenceFloor() && m <= K.hi + 2);
   const below = Cx - 1;
 
   // the Stollen
@@ -555,14 +572,14 @@ export function barformMelody(tonicPc, mode, nPhrases, rng) {
   BARFORM_STATS.tunes++;
   const K = makeKey(tonicPc, mode);
   const nP = Math.max(2, Math.min(4, nPhrases));
-  // restarts are geometric (24,000 calls: median 0, worst 21), so 200 is
-  // never reached in practice; the throw only guards against a planner bug
+  // restarts are geometric (a median of none), so 200 is never reached in
+  // practice; if it were, the draft is abandoned and the next one tries
   for (let restart = 0; restart < 200; restart++) {
     const tune = tryTune(K, nP, rng);
     if (tune) return tune;
     BARFORM_STATS.restarts++;
   }
-  throw new Error(`barform: no tune for tonic ${tonicPc} ${mode} (${nPhrases} phrases)`);
+  return null;
 }
 
 // note names for listings
