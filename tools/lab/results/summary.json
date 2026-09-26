@@ -1,0 +1,1637 @@
+{
+ "barform-ed2-barform": {
+  "name": "ed2-barform",
+  "planner": "barform",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules"
+  ],
+  "N": 3000,
+  "nulls": 0,
+  "meanAttempts": 1.0503333333333333,
+  "meanTries": 1.0503333333333333,
+  "firstAttemptShare": 0.953,
+  "firstTryShare": 0.953,
+  "maxAttempts": 3,
+  "meanChords": 43.959666666666664,
+  "chordsHist": {
+   "20": 232,
+   "30": 711,
+   "40": 1358,
+   "50": 595,
+   "60": 104
+  },
+  "stages": {
+   "kept": 3000,
+   "inner": 97,
+   "bass": 54
+  },
+  "failedAttemptStage": {
+   "inner": 97,
+   "bass": 54
+  },
+  "violations": {},
+  "sop": {
+   "rep": 18250,
+   "step": 83390,
+   "third": 18050,
+   "fourth": 5746,
+   "fifth": 2281,
+   "sixth": 1162,
+   "larger": 0,
+   "n": 128879
+  },
+  "meanAmbitus": 12.351333333333333,
+  "ambitusHist": {
+   "6": 1,
+   "7": 20,
+   "8": 118,
+   "9": 199,
+   "10": 261,
+   "11": 34,
+   "12": 1073,
+   "13": 308,
+   "14": 659,
+   "15": 190,
+   "16": 96,
+   "17": 41
+  },
+  "lowest": 62,
+  "highest": 79,
+  "meanPitch": 70.391165731803,
+  "sopOutOfRangePieces": 0,
+  "warningsPerPiece": 1.5156666666666667,
+  "warningsPer10Chords": 0.34478575057439015,
+  "warnPieces": 1986,
+  "warnings": {
+   "doubled leading tone": 1090,
+   "antiparallel": 548,
+   "a: melodic tritone": 225,
+   "direct fifths": 516,
+   "t: melodic tritone": 359,
+   "b: melodic tritone": 72,
+   "direct octaves": 36
+  },
+  "distinctSopranos": 3000,
+  "distinctPieces": 3000,
+  "msPerAddress": 40.18088923333333,
+  "stollen": {
+   "pieces": 3000,
+   "sameBass": 0.20533333333333334,
+   "sameSkeleton": 0.038,
+   "sameSkeletonAfterFirstChord": 0.06633333333333333,
+   "sameSurface": 0.0003333333333333333,
+   "meanChordsDiffering": 7.075666666666667,
+   "meanStollenChords": 13.059333333333333,
+   "firstDiffHist": {
+    "0": 2596,
+    "1": 44,
+    "2": 44,
+    "3": 36,
+    "4": 28,
+    "5": 23,
+    "6": 20,
+    "7": 19,
+    "8": 11,
+    "9": 15,
+    "10": 5,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 11,
+    "15": 4
+   }
+  },
+  "reprise": {
+   "pieces": 533,
+   "sameBass": 0.30393996247654786,
+   "sameSkeleton": 0.06191369606003752
+  },
+  "forms": {
+   "ABABCDE": 590,
+   "AABC": 601,
+   "ABABCD": 1276,
+   "ABABCDB": 278,
+   "AABCA": 91,
+   "ABABCDEB": 164
+  },
+  "wallSeconds": 15.584
+ },
+ "barform-ed2-shipped": {
+  "name": "ed2-shipped",
+  "planner": "shipped",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules"
+  ],
+  "N": 3000,
+  "nulls": 0,
+  "meanAttempts": 1.0236666666666667,
+  "meanTries": 1.0236666666666667,
+  "firstAttemptShare": 0.9773333333333334,
+  "firstTryShare": 0.9773333333333334,
+  "maxAttempts": 3,
+  "meanChords": 15.094,
+  "chordsHist": {
+   "0": 204,
+   "10": 2336,
+   "20": 460
+  },
+  "stages": {
+   "kept": 3000,
+   "inner": 54,
+   "bass": 16,
+   "checker": 1
+  },
+  "failedAttemptStage": {
+   "inner": 54,
+   "bass": 16,
+   "checker": 1
+  },
+  "violations": {
+   "s: augmented second": 1
+  },
+  "sop": {
+   "rep": 5349,
+   "step": 32298,
+   "third": 1902,
+   "fourth": 1937,
+   "fifth": 645,
+   "sixth": 116,
+   "larger": 35,
+   "n": 42282
+  },
+  "meanAmbitus": 9.211666666666666,
+  "ambitusHist": {
+   "3": 20,
+   "4": 45,
+   "5": 287,
+   "6": 63,
+   "7": 666,
+   "8": 265,
+   "9": 370,
+   "10": 380,
+   "11": 123,
+   "12": 456,
+   "13": 51,
+   "14": 128,
+   "15": 43,
+   "16": 39,
+   "17": 49,
+   "18": 3,
+   "19": 7,
+   "20": 4,
+   "21": 1
+  },
+  "lowest": 60,
+  "highest": 81,
+  "meanPitch": 69.09517021447478,
+  "sopOutOfRangePieces": 0,
+  "warningsPerPiece": 0.35,
+  "warningsPer10Chords": 0.23188021730488936,
+  "warnPieces": 832,
+  "warnings": {
+   "direct fifths": 154,
+   "antiparallel": 209,
+   "a: melodic tritone": 68,
+   "b: melodic tritone": 12,
+   "t: melodic tritone": 66,
+   "doubled leading tone": 406,
+   "direct octaves": 24
+  },
+  "distinctSopranos": 2992,
+  "distinctPieces": 2999,
+  "msPerAddress": 12.06048713333332,
+  "wallSeconds": 4.732
+ },
+ "baseline": {
+  "name": "baseline",
+  "flags": [],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 36552,
+  "firstDraft": 12645,
+  "stages": {
+   "inner": 16030,
+   "kept": 20000,
+   "checker": 194,
+   "bass": 281,
+   "surface": 47
+  },
+  "maxDrafts": 25,
+  "maxAt": 6296,
+  "warnPieces": 7086,
+  "warnings": {
+   "s out of range": 1812,
+   "direct fifths": 1469,
+   "doubled leading tone": 2824,
+   "antiparallel": 911,
+   "t: melodic tritone": 460,
+   "b: melodic tritone": 59,
+   "s: melodic tritone": 452,
+   "a: melodic tritone": 568,
+   "direct octaves": 136
+  },
+  "lastNotTonic": 119,
+  "sopRange": 1812,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 2277
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1906
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1704
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1924
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1884
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3601
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1910
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1712
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3930
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1749
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1839
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 4690
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4983
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2443
+   }
+  },
+  "undef": 8,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 16552,
+  "firstTune": 12645,
+  "lastBassNotTonic": 128,
+  "meanDrafts": 1.8276,
+  "firstDraftShare": 0.6322,
+  "meanTunesDiscarded": 0.8276,
+  "firstTuneShare": 0.6322,
+  "wallSeconds": 44.466
+ },
+ "bassAug2": {
+  "name": "bassAug2",
+  "flags": [
+   "bassAug2"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 36418,
+  "firstDraft": 12678,
+  "stages": {
+   "inner": 15974,
+   "kept": 20000,
+   "checker": 120,
+   "bass": 276,
+   "surface": 48
+  },
+  "maxDrafts": 21,
+  "maxAt": 7487,
+  "warnPieces": 7092,
+  "warnings": {
+   "s out of range": 1806,
+   "direct fifths": 1473,
+   "doubled leading tone": 2824,
+   "antiparallel": 916,
+   "t: melodic tritone": 460,
+   "b: melodic tritone": 56,
+   "s: melodic tritone": 453,
+   "a: melodic tritone": 575,
+   "direct octaves": 134
+  },
+  "lastNotTonic": 119,
+  "sopRange": 1806,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 2277
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1902
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1684
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1924
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1884
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3555
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1904
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1702
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3930
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1743
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1839
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 4648
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4983
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2443
+   }
+  },
+  "undef": 8,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 16418,
+  "firstTune": 12678,
+  "lastBassNotTonic": 130,
+  "meanDrafts": 1.8209,
+  "firstDraftShare": 0.6339,
+  "meanTunesDiscarded": 0.8209,
+  "firstTuneShare": 0.6339,
+  "wallSeconds": 45.823
+ },
+ "bassFallback": {
+  "name": "bassFallback",
+  "flags": [
+   "bassFallback"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 69804,
+  "firstDraft": 12645,
+  "stages": {
+   "inner": 48458,
+   "kept": 20000,
+   "checker": 1015,
+   "bass": 137,
+   "surface": 194
+  },
+  "maxDrafts": 61,
+  "maxAt": 4664,
+  "warnPieces": 7079,
+  "warnings": {
+   "s out of range": 2061,
+   "direct fifths": 1272,
+   "doubled leading tone": 2846,
+   "antiparallel": 1034,
+   "t: melodic tritone": 448,
+   "s: melodic tritone": 412,
+   "b: melodic tritone": 55,
+   "a: melodic tritone": 580,
+   "direct octaves": 130
+  },
+  "lastNotTonic": 154,
+  "sopRange": 2061,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 5427
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 5564
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 4174
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 3264
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 2745
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 6684
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 5344
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 4327
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 5366
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 4434
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 2742
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 7406
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 6179
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 6148
+   }
+  },
+  "undef": 6,
+  "bassTryUsed": 5323,
+  "tunesDiscarded": 3567,
+  "firstTune": 17185,
+  "lastBassNotTonic": 343,
+  "meanDrafts": 3.4902,
+  "firstDraftShare": 0.6322,
+  "meanTunesDiscarded": 0.1784,
+  "firstTuneShare": 0.8592,
+  "wallSeconds": 61.786
+ },
+ "bassSpace": {
+  "name": "bassSpace",
+  "flags": [
+   "bassSpace"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 24362,
+  "firstDraft": 16594,
+  "stages": {
+   "kept": 20000,
+   "inner": 3965,
+   "checker": 217,
+   "bass": 142,
+   "surface": 38
+  },
+  "maxDrafts": 7,
+  "maxAt": 4664,
+  "warnPieces": 7247,
+  "warnings": {
+   "s out of range": 2418,
+   "antiparallel": 911,
+   "direct fifths": 1337,
+   "doubled leading tone": 2818,
+   "a: melodic tritone": 620,
+   "s: melodic tritone": 442,
+   "t: melodic tritone": 447,
+   "b: melodic tritone": 59,
+   "direct octaves": 121
+  },
+  "lastNotTonic": 163,
+  "sopRange": 2418,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 1838
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1633
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1641
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1772
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1813
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 1891
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1688
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1628
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 1709
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1617
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1793
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 1762
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 1697
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 1880
+   }
+  },
+  "undef": 8,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 4362,
+  "firstTune": 16594,
+  "lastBassNotTonic": 178,
+  "meanDrafts": 1.2181,
+  "firstDraftShare": 0.8297,
+  "meanTunesDiscarded": 0.2181,
+  "firstTuneShare": 0.8297,
+  "wallSeconds": 34.672
+ },
+ "edition2": {
+  "name": "recommendedInner",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 20469,
+  "firstDraft": 19545,
+  "stages": {
+   "kept": 20000,
+   "inner": 361,
+   "bass": 99,
+   "checker": 9
+  },
+  "maxDrafts": 3,
+  "maxAt": 1716,
+  "warnPieces": 5497,
+  "warnings": {
+   "direct fifths": 1045,
+   "antiparallel": 1191,
+   "a: melodic tritone": 501,
+   "b: melodic tritone": 79,
+   "t: melodic tritone": 440,
+   "doubled leading tone": 2833,
+   "direct octaves": 151
+  },
+  "lastNotTonic": 0,
+  "sopRange": 0,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 1685
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1307
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1286
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1598
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1601
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 1372
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1364
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1257
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 1599
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1302
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1608
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 1286
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 1581
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 1623
+   }
+  },
+  "undef": 0,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 469,
+  "firstTune": 19545,
+  "lastBassNotTonic": 0,
+  "meanDrafts": 1.0234,
+  "firstDraftShare": 0.9772,
+  "meanTunesDiscarded": 0.0234,
+  "firstTuneShare": 0.9772,
+  "wallSeconds": 32.746
+ },
+ "edition2Fallback": {
+  "name": "edition2Fallback",
+  "flags": [
+   "sbParallel",
+   "bassAug2",
+   "bassSpace",
+   "tonicEnd",
+   "formulaFit",
+   "seamFix",
+   "register",
+   "innerRules",
+   "bassFallback"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 21753,
+  "firstDraft": 19545,
+  "stages": {
+   "kept": 20000,
+   "inner": 1579,
+   "bass": 99,
+   "checker": 75
+  },
+  "maxDrafts": 14,
+  "maxAt": 15370,
+  "warnPieces": 5500,
+  "warnings": {
+   "direct fifths": 1041,
+   "antiparallel": 1188,
+   "a: melodic tritone": 504,
+   "b: melodic tritone": 80,
+   "t: melodic tritone": 446,
+   "doubled leading tone": 2836,
+   "direct octaves": 152
+  },
+  "lastNotTonic": 0,
+  "sopRange": 0,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 1740
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1399
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1315
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1717
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1769
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 1597
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1592
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1283
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 1645
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1353
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1741
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 1311
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 1612
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 1679
+   }
+  },
+  "undef": 0,
+  "bassTryUsed": 258,
+  "tunesDiscarded": 206,
+  "firstTune": 19796,
+  "lastBassNotTonic": 0,
+  "meanDrafts": 1.0877,
+  "firstDraftShare": 0.9772,
+  "meanTunesDiscarded": 0.0103,
+  "firstTuneShare": 0.9898,
+  "wallSeconds": 31.873
+ },
+ "exactInner": {
+  "name": "exactInner",
+  "flags": [
+   "exactInner"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 35329,
+  "firstDraft": 12929,
+  "stages": {
+   "inner": 14875,
+   "kept": 20000,
+   "checker": 157,
+   "bass": 274,
+   "surface": 23
+  },
+  "maxDrafts": 19,
+  "maxAt": 2912,
+  "warnPieces": 6584,
+  "warnings": {
+   "s out of range": 1912,
+   "direct fifths": 1467,
+   "doubled leading tone": 2556,
+   "antiparallel": 747,
+   "t: melodic tritone": 300,
+   "b: melodic tritone": 56,
+   "s: melodic tritone": 454,
+   "a: melodic tritone": 521,
+   "direct octaves": 133
+  },
+  "lastNotTonic": 124,
+  "sopRange": 1912,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 2233
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1863
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1697
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1880
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1849
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3529
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1886
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1700
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3828
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1738
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1802
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 4308
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4666
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2350
+   }
+  },
+  "undef": 8,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 15329,
+  "firstTune": 12929,
+  "lastBassNotTonic": 138,
+  "meanDrafts": 1.7665,
+  "firstDraftShare": 0.6464,
+  "meanTunesDiscarded": 0.7664,
+  "firstTuneShare": 0.6464,
+  "wallSeconds": 66.686
+ },
+ "formulaFit": {
+  "name": "formulaFit3",
+  "flags": [
+   "formulaFit"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 33523,
+  "firstDraft": 13430,
+  "stages": {
+   "inner": 13316,
+   "kept": 20000,
+   "checker": 120,
+   "surface": 56,
+   "bass": 31
+  },
+  "maxDrafts": 18,
+  "maxAt": 17304,
+  "warnPieces": 5871,
+  "warnings": {
+   "direct fifths": 1300,
+   "doubled leading tone": 2971,
+   "s: melodic tritone": 418,
+   "t: melodic tritone": 477,
+   "antiparallel": 884,
+   "b: melodic tritone": 85,
+   "a: melodic tritone": 524,
+   "direct octaves": 159
+  },
+  "lastNotTonic": 0,
+  "sopRange": 0,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 1884
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1882
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1693
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1878
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1812
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3104
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1744
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1643
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3556
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1731
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1797
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 3664
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4833
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2302
+   }
+  },
+  "undef": 0,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 13523,
+  "firstTune": 13430,
+  "lastBassNotTonic": 69,
+  "meanDrafts": 1.6762,
+  "firstDraftShare": 0.6715,
+  "meanTunesDiscarded": 0.6762,
+  "firstTuneShare": 0.6715,
+  "wallSeconds": 44.421
+ },
+ "innerRules": {
+  "name": "innerRules",
+  "flags": [
+   "innerRules"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 36474,
+  "firstDraft": 12659,
+  "stages": {
+   "inner": 16040,
+   "kept": 20000,
+   "checker": 153,
+   "bass": 281
+  },
+  "maxDrafts": 25,
+  "maxAt": 6296,
+  "warnPieces": 7156,
+  "warnings": {
+   "s out of range": 1823,
+   "direct fifths": 1466,
+   "doubled leading tone": 2832,
+   "antiparallel": 918,
+   "t: melodic tritone": 505,
+   "b: melodic tritone": 59,
+   "s: melodic tritone": 454,
+   "a: melodic tritone": 604,
+   "direct octaves": 134
+  },
+  "lastNotTonic": 119,
+  "sopRange": 1823,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 2277
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1906
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1698
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1922
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1884
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3593
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1904
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1708
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3924
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1744
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1838
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 4674
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4959
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2443
+   }
+  },
+  "undef": 8,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 16474,
+  "firstTune": 12659,
+  "lastBassNotTonic": 128,
+  "meanDrafts": 1.8237,
+  "firstDraftShare": 0.633,
+  "meanTunesDiscarded": 0.8237,
+  "firstTuneShare": 0.633,
+  "wallSeconds": 49.979
+ },
+ "melodyFixes": {
+  "name": "melodyFixes3",
+  "flags": [
+   "seamFix",
+   "formulaFit"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 33667,
+  "firstDraft": 13389,
+  "stages": {
+   "inner": 13458,
+   "kept": 20000,
+   "checker": 122,
+   "surface": 55,
+   "bass": 32
+  },
+  "maxDrafts": 18,
+  "maxAt": 17304,
+  "warnPieces": 5643,
+  "warnings": {
+   "direct fifths": 1291,
+   "doubled leading tone": 2902,
+   "t: melodic tritone": 479,
+   "antiparallel": 896,
+   "b: melodic tritone": 84,
+   "a: melodic tritone": 522,
+   "direct octaves": 156
+  },
+  "lastNotTonic": 0,
+  "sopRange": 0,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 1888
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1881
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1690
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1877
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1818
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3106
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1743
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1643
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3572
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1729
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1800
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 3705
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4904
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2311
+   }
+  },
+  "undef": 0,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 13667,
+  "firstTune": 13389,
+  "lastBassNotTonic": 68,
+  "meanDrafts": 1.6833,
+  "firstDraftShare": 0.6694,
+  "meanTunesDiscarded": 0.6834,
+  "firstTuneShare": 0.6694,
+  "wallSeconds": 83.381
+ },
+ "register": {
+  "name": "register",
+  "flags": [
+   "register"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 32606,
+  "firstDraft": 13033,
+  "stages": {
+   "inner": 12274,
+   "kept": 20000,
+   "bass": 124,
+   "checker": 172,
+   "surface": 36
+  },
+  "maxDrafts": 15,
+  "maxAt": 17377,
+  "warnPieces": 6495,
+  "warnings": {
+   "s out of range": 1388,
+   "direct fifths": 1179,
+   "t: melodic tritone": 458,
+   "antiparallel": 953,
+   "doubled leading tone": 2807,
+   "s: melodic tritone": 513,
+   "direct octaves": 137,
+   "a: melodic tritone": 523,
+   "b: melodic tritone": 55
+  },
+  "lastNotTonic": 216,
+  "sopRange": 1388,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 2175
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1799
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1805
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1924
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 2633
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3257
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1775
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1897
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3371
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1749
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1854
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 2924
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 3311
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2132
+   }
+  },
+  "undef": 6,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 12606,
+  "firstTune": 13033,
+  "lastBassNotTonic": 234,
+  "meanDrafts": 1.6303,
+  "firstDraftShare": 0.6516,
+  "meanTunesDiscarded": 0.6303,
+  "firstTuneShare": 0.6516,
+  "wallSeconds": 43.128
+ },
+ "sbParallel": {
+  "name": "sbParallel",
+  "flags": [
+   "sbParallel"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 31152,
+  "firstDraft": 14645,
+  "stages": {
+   "inner": 10713,
+   "kept": 20000,
+   "checker": 194,
+   "bass": 205,
+   "surface": 40
+  },
+  "maxDrafts": 18,
+  "maxAt": 585,
+  "warnPieces": 7216,
+  "warnings": {
+   "s out of range": 1794,
+   "direct fifths": 1416,
+   "doubled leading tone": 3045,
+   "a: melodic tritone": 520,
+   "antiparallel": 1028,
+   "t: melodic tritone": 438,
+   "b: melodic tritone": 76,
+   "s: melodic tritone": 434,
+   "direct octaves": 119
+  },
+  "lastNotTonic": 109,
+  "sopRange": 1794,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 2147
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1525
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1364
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1778
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1670
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 2837
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1551
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1351
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3561
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1423
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1661
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 3663
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4379
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2242
+   }
+  },
+  "undef": 6,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 11152,
+  "firstTune": 14645,
+  "lastBassNotTonic": 225,
+  "meanDrafts": 1.5576,
+  "firstDraftShare": 0.7322,
+  "meanTunesDiscarded": 0.5576,
+  "firstTuneShare": 0.7322,
+  "wallSeconds": 39.402
+ },
+ "seamFix": {
+  "name": "seamFix",
+  "flags": [
+   "seamFix"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 35970,
+  "firstDraft": 12511,
+  "stages": {
+   "inner": 15550,
+   "kept": 20000,
+   "bass": 239,
+   "checker": 137,
+   "surface": 44
+  },
+  "maxDrafts": 19,
+  "maxAt": 2912,
+  "warnPieces": 7113,
+  "warnings": {
+   "s out of range": 2268,
+   "direct fifths": 1216,
+   "a: melodic tritone": 502,
+   "doubled leading tone": 2853,
+   "antiparallel": 925,
+   "t: melodic tritone": 462,
+   "b: melodic tritone": 102,
+   "s: melodic tritone": 247,
+   "direct octaves": 159
+  },
+  "lastNotTonic": 382,
+  "sopRange": 2268,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 2257
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1878
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1731
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1925
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 2078
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3401
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1927
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1814
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3830
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1772
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1880
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 4243
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4807
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2427
+   }
+  },
+  "undef": 10,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 15970,
+  "firstTune": 12511,
+  "lastBassNotTonic": 370,
+  "meanDrafts": 1.7985,
+  "firstDraftShare": 0.6256,
+  "meanTunesDiscarded": 0.7985,
+  "firstTuneShare": 0.6256,
+  "wallSeconds": 61.952
+ },
+ "tonicEnd": {
+  "name": "tonicEnd",
+  "flags": [
+   "tonicEnd"
+  ],
+  "N": 20000,
+  "nulls": 0,
+  "drafts": 36747,
+  "firstDraft": 12549,
+  "stages": {
+   "inner": 15997,
+   "kept": 20000,
+   "checker": 192,
+   "bass": 511,
+   "surface": 47
+  },
+  "maxDrafts": 25,
+  "maxAt": 6296,
+  "warnPieces": 7032,
+  "warnings": {
+   "s out of range": 1749,
+   "direct fifths": 1475,
+   "doubled leading tone": 2820,
+   "antiparallel": 907,
+   "t: melodic tritone": 461,
+   "b: melodic tritone": 59,
+   "s: melodic tritone": 445,
+   "a: melodic tritone": 573,
+   "direct octaves": 136
+  },
+  "lastNotTonic": 52,
+  "sopRange": 1749,
+  "byKey": {
+   "Eb major": {
+    "pieces": 1633,
+    "drafts": 2295
+   },
+   "F minor": {
+    "pieces": 1274,
+    "drafts": 1919
+   },
+   "A minor": {
+    "pieces": 1282,
+    "drafts": 1751
+   },
+   "G major": {
+    "pieces": 1550,
+    "drafts": 1951
+   },
+   "Bb major": {
+    "pieces": 1574,
+    "drafts": 1886
+   },
+   "D minor": {
+    "pieces": 1306,
+    "drafts": 3623
+   },
+   "Eb minor": {
+    "pieces": 1284,
+    "drafts": 1913
+   },
+   "Bb minor": {
+    "pieces": 1254,
+    "drafts": 1712
+   },
+   "D major": {
+    "pieces": 1568,
+    "drafts": 3941
+   },
+   "G minor": {
+    "pieces": 1292,
+    "drafts": 1758
+   },
+   "A major": {
+    "pieces": 1575,
+    "drafts": 1856
+   },
+   "C minor": {
+    "pieces": 1274,
+    "drafts": 4690
+   },
+   "C major": {
+    "pieces": 1560,
+    "drafts": 4985
+   },
+   "F major": {
+    "pieces": 1574,
+    "drafts": 2467
+   }
+  },
+  "undef": 8,
+  "bassTryUsed": 0,
+  "tunesDiscarded": 16747,
+  "firstTune": 12549,
+  "lastBassNotTonic": 0,
+  "meanDrafts": 1.8374,
+  "firstDraftShare": 0.6274,
+  "meanTunesDiscarded": 0.8374,
+  "firstTuneShare": 0.6274,
+  "wallSeconds": 48.583
+ }
+}

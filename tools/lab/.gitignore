@@ -1,0 +1,4 @@
+# per-address results (hashes for compare.mjs) are large and regenerable;
+# summary.json keeps every run's aggregates
+results/*.json
+!results/summary.json
