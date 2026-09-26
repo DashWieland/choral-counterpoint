@@ -22,8 +22,9 @@ These styles are unusual in one crucial way: they are among the only creative do
     └── outer_voice_table.json    # 16,852 outer-voice transitions from 345 chorales
 
 engine/                           # fully automatic composition (no LLM in the loop)
-├── compose.py                    # melody planner → oracle-governed bass beam search
-│                                 #   → inner-voice search → verify → ornament (~30 ms/piece)
+├── compose.py                    # bar-form melody planner → oracle-governed bass beam
+│                                 #   search → inner-voice search → verify → ornament (~80 ms/piece)
+├── census.py                     # what 2,520 composed pieces look like (first drafts, bar form)
 └── serve.py                      # HTTP server: /compose, /compose.mid, /next
                                   #   (compose-ahead buffer for instruments)
 

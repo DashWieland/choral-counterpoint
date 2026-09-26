@@ -102,7 +102,10 @@ plain 91% of the time). Every candidate ornament is auto-rejected if it
 would break a rule or create a new surface parallel. Verify any ornamented
 score with `python scripts/check_ornaments.py piece.json` — event-format
 scores carry their skeleton, and the checker enforces NCT discipline
-(suspensions prepared and resolved down, passing tones stepwise).
+(suspensions prepared and resolved down, passing tones stepwise). A skeleton
+in bar form may carry `"stollen": N`, its first N chords sung again right
+after them; every ornament there is written into the repeat too, so the
+repeat stays literal.
 
 ## Files
 

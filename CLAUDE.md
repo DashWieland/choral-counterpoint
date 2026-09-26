@@ -58,6 +58,9 @@ layer that skipped ground-truth confrontation shipped with bugs.
   `node census.mjs sample 2000` for addresses spread up to 2^53 (Edition 2
   with bar form: first draft kept 96.9% and 97.4%, nothing empty, off the
   tonic, or out of range)
+- Python engine census: `python engine/census.py` (2,520 pieces, every
+  tonic, mode and size: first draft kept 96.9%, every piece in bar form
+  with a literal repeat, on the tonic and in range; about 3 minutes)
 - Edition 1 golden test: `cd instrument/web && node golden.mjs`
   (pieces 1–20,000 unchanged; about five minutes)
 - Machine address contract: `cd instrument/web && node test_machine.mjs`
