@@ -1,13 +1,18 @@
 // Batch validation of the JS engine port: compose pieces No. 1..200,
-// demand every one violation-free, report stats.
+// demand every one violation-free, report stats, and check that pieces
+// 1..200 still match Edition 1 (golden-ed1.json; golden.mjs checks 20,000).
+import { readFileSync } from 'node:fs';
 import { composePiece, checkChorale } from './engine.js';
+import { digestOf, digestOfDigests } from './golden.mjs';
 
 const t0 = Date.now();
 let ok = 0, failed = 0, chrom = 0, warnings = 0, ornaments = 0, slots = 0;
 const keys = {};
 const intervals = {};
+const digests = [];
 for (let n = 1; n <= 200; n++) {
   const p = composePiece(n);
+  digests.push(digestOf(p));
   if (!p) { failed++; console.log(`No. ${n}: FAILED to compose`); continue; }
   if (p.violations !== 0) { failed++; console.log(`No. ${n}: violations!`); continue; }
   ok++;
@@ -42,3 +47,7 @@ const top = Object.entries(intervals).sort((a,b)=>b[1]-a[1]).slice(0,5)
   .map(([iv,c])=>`${iv}:${Math.round(100*c/tot)}%`).join(' ');
 console.log(`soprano intervals: ${top}`);
 console.log('keys:', Object.entries(keys).map(([k,c])=>`${k}×${c}`).join(' '));
+
+const golden = JSON.parse(readFileSync(new URL('./golden-ed1.json', import.meta.url), 'utf8'));
+if (digestOfDigests(digests) === golden.first200) console.log('Edition 1: pieces 1..200 unchanged');
+else { console.log('EDITION 1 CHANGED: pieces 1..200 differ from golden-ed1.json'); process.exitCode = 1; }
