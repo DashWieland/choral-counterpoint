@@ -210,3 +210,10 @@ Dash's play-testing taught us better:
   and cranking off either end replays the piece in hand. Null chorales
   appear past ~1e15, where the retry seeds lose float precision (~4% near
   the top), and are stepped over.
+- **The same piece in every browser** (2026-09). The bass search ranks
+  lines by summing log1p of Bach's counts, and JavaScript lets each browser
+  approximate log1p. Chrome's value is not the correctly rounded one for 32
+  of the first 1,601 integers, which is enough to change 3 of the first
+  3,000 pieces under a different math library. `log1p.js` freezes Chrome's
+  values, and `golden.mjs` holds digests of pieces 1–20,000 so any change
+  that would renumber the library fails loudly.
