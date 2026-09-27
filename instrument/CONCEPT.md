@@ -193,8 +193,14 @@ Dash's play-testing taught us better:
 - **Tape x-axis is performance time.** Fermata chords draw twice as wide and
   the playhead moves linearly. (Drawn-width ≠ heard-length was the single
   most disorienting bug of play-testing.)
-- **Pieces crossfade** (~1.4 s release into the reverb while the next piece
-  attacks) instead of breathing in silence — radio, not hymnal.
+- **Pieces breathe** (2026-09): four eighths of blank barrel between them
+  (1.8 s at the motor's 66 BPM), the church ringing out while the bellows
+  keep blowing. They crossfaded before (a 1.4 s release into the reverb while
+  the next piece attacked: radio, not hymnal), but the organ's valves cut
+  that release to under half a second, so the next piece's first chord
+  landed on the last one. Dash chose the pause by ear from rendered seams;
+  the barrel audibly changing tunes in it was "really cute, but I think too
+  much".
 - **Tempo slider** (40–120) sets the motor; cranking overrides temporarily.
 - **Capture is crank-only.** The cabinet face scrolls the page; only the
   crank captures wheel/drag. (The concept's "pointer-over the machine"

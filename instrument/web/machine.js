@@ -12,6 +12,7 @@ import { Organ } from './audio.js';
 const EW = 26;                 // px per eighth at design scale
 const MOTOR_BPM = 66;
 const MAX_BPM = 140, MIN_AUDIBLE_BPM = 5;
+const BREATH = 2;              // eighths of blank barrel either side of a piece
 const LAST_PIECE = Number.MAX_SAFE_INTEGER;   // one further and n + 1 === n
 const MAX_NULL_RUN = 32;
 
@@ -179,7 +180,7 @@ export function mountHurdyGurdy(container, opts = {}) {
   const params = new URLSearchParams(location.search);
   const compose = composePiece;
   let { piece, number } = openAddress(opts.piece || params.get('piece'), compose);
-  let pos = -2;                  // performance eighths; small lead-in
+  let pos = -BREATH;             // performance eighths; the blank before a piece
   let bpm = 0;                   // signed: negative = retrograde
   let bpmTarget = 0;
   let motorOn = false;
@@ -216,8 +217,8 @@ export function mountHurdyGurdy(container, opts = {}) {
     ({ perfAt, perfTotal, flat } = performanceOf(piece));
   }
 
-  function setPiece(p, n, startPos, elide = false) {
-    for (const h of sounding.values()) organ && organ.noteOff(h, elide ? 1.4 : 0.14);
+  function setPiece(p, n, startPos) {
+    for (const h of sounding.values()) organ && organ.noteOff(h);
     sounding.clear();
     piece = p; number = n; pos = startPos;
     reflatten();
@@ -234,7 +235,7 @@ export function mountHurdyGurdy(container, opts = {}) {
       history.replaceState(null, '', u);
     } catch { /* embedded contexts may forbid this */ }
   }
-  setPiece(piece, number, -2);
+  setPiece(piece, number, -BREATH);
 
   function ensureAudio() {
     if (!audioCtx) {
@@ -270,14 +271,16 @@ export function mountHurdyGurdy(container, opts = {}) {
     crankRot.style.transform = `rotate(${crankAngle}rad)`;
     crankRot.style.transformOrigin = '60px 60px';
 
-    // piece transitions (with a breath of silence either side); off either
-    // end of the shelf, the piece in hand plays again
-    if (pos >= perfTotal) {
+    // piece transitions: between pieces the barrel runs blank for a breath
+    // (2 x BREATH eighths, 1.8 s at the motor's 66 BPM), the last chord ending
+    // like any other while the church rings out and the bellows keep
+    // blowing. Off either end of the shelf, the piece in hand plays again.
+    if (pos >= perfTotal + BREATH) {
       const nx = pieceOrNext(number + 1, 1, compose) || { piece, number };
-      setPiece(nx.piece, nx.number, 0, true);     // last chord rings into the next piece
-    } else if (pos < 0 && bpm < -MIN_AUDIBLE_BPM) {
+      setPiece(nx.piece, nx.number, -BREATH);
+    } else if (pos < -BREATH && bpm < -MIN_AUDIBLE_BPM) {
       const pv = pieceOrNext(Math.max(1, number - 1), -1, compose) || { piece, number };
-      setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) - 0.01, true);
+      setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) + BREATH - 0.01);
     }
 
     // declarative sounding set: works forward, backward, and through seeks
