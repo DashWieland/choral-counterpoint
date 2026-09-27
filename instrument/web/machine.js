@@ -187,6 +187,7 @@ export function mountHurdyGurdy(container, opts = {}) {
   let lastUserInput = -1e9;
   let crankAngle = 2.4;            // at rest the arm hangs low, as cranks do
   let organ = null, audioCtx = null;
+  let windOn = false;
   let dragging = () => false;
   const sounding = new Map();    // eventKey -> handle
   let colors = null;
@@ -243,6 +244,13 @@ export function mountHurdyGurdy(container, opts = {}) {
     if (audioCtx.state === 'suspended') audioCtx.resume();
   }
 
+  // the crank works the bellows too: wind while it turns fast enough to sound
+  function setWind(on) {
+    if (!organ || on === windOn) return;
+    windOn = on;
+    organ.wind(on ? 1 : 0);
+  }
+
   // ---- physics + transport ----
   function tick(dt) {
     const idle = performance.now() / 1000 - lastUserInput > 1.2;
@@ -251,6 +259,7 @@ export function mountHurdyGurdy(container, opts = {}) {
     bpmTarget = Math.max(-MAX_BPM, Math.min(MAX_BPM, bpmTarget));
     bpm += (bpmTarget - bpm) * Math.min(1, dt * 6);   // smooths wheel-tick pulses
     const audible = Math.abs(bpm) >= MIN_AUDIBLE_BPM;
+    setWind(audible);
     if (!audible && organ && sounding.size) {
       for (const h of sounding.values()) organ.noteOff(h, 0.5);
       sounding.clear();
@@ -478,6 +487,7 @@ export function mountHurdyGurdy(container, opts = {}) {
     if (document.hidden) {
       bpm = 0; bpmTarget = 0;
       if (organ) { organ.releaseAll(0.2); sounding.clear(); }
+      setWind(false);                            // no frames run while hidden
     }
   };
   document.addEventListener('visibilitychange', onVisibility);

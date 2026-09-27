@@ -252,4 +252,10 @@ Dash's play-testing taught us better:
   suspension (the engine writes the held eighth as its own event, so the
   choir struck it again, about six times a piece) and lifts a repeated note
   for a pin's width before it strikes again. Fermatas no longer swell: an
-  organ can't.
+  organ can't. Then it was given a place, again by ear from rendered rooms:
+  it is heard from far down the nave, in a wooden case that colours the
+  pipes, mechanism and all (the bellows rush while the crank turns, and each
+  key's valve knocks). From that far off, the room's tail muddied every chord
+  where it leaned on the low middle (the case added low-middle weight but no
+  ring; the tail was what rang), so the room keeps its low end lean. It plays
+  as loud as the choir did.
