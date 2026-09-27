@@ -7,15 +7,53 @@
 // No. N from seed N — the same piece for everyone.
 
 import { composePiece } from './engine.js';
-import { Choir } from './audio.js';
+import { Organ } from './audio.js';
 
 const EW = 26;                 // px per eighth at design scale
 const MOTOR_BPM = 66;
 const MAX_BPM = 140, MIN_AUDIBLE_BPM = 5;
+const BREATH = 2;              // eighths of blank barrel either side of a piece
 const LAST_PIECE = Number.MAX_SAFE_INTEGER;   // one further and n + 1 === n
 const MAX_NULL_RUN = 32;
 
 const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// A piece laid out on the tape. Positions are performance eighths (a
+// fermata's two eighths last double). For the sound: a suspension holds the
+// note before it over the beat, where it is no longer that voice's chord
+// tone; the engine writes the held eighth as an event of its own, so here it
+// is tied (sounds: false, and the note it continues sounds on to its end). A
+// note struck again at the same pitch lifts for a pin's width first
+// (soundEnd), as a barrel organ's key does. The tape draws every event.
+const PIN_GAP = 0.08;          // eighths: ~36 ms at the motor's 66 BPM
+export function performanceOf(piece) {
+  const ferm = new Set(piece.fermataEighths);
+  const perfAt = [0];
+  for (let k = 0; k < piece.totalEighths; k++)
+    perfAt.push(perfAt[k] + ((ferm.has(k) || ferm.has(k - 1)) ? 2 : 1));
+  const flat = [];
+  for (const vn of ['s', 'a', 't', 'b']) {
+    const chord = piece.skeleton[vn];
+    let t = 0, prev = null, head = null;
+    for (const [m, ln] of piece.events[vn]) {
+      const ev = { vn, m, start: perfAt[t], end: perfAt[t + ln], ferm: ferm.has(t),
+                   key: `${vn}:${t}`, sounds: true };
+      ev.soundEnd = ev.end;
+      if (prev && prev.m === m && prev.end === ev.start) {
+        const slot = t >> 1;
+        const held = ln === 1 && t % 2 === 0 && slot > 0 &&
+          m === chord[slot - 1] && m !== chord[slot];
+        if (held && head) { ev.sounds = false; head.soundEnd = ev.end; }
+        else prev.soundEnd = Math.max(prev.start, prev.end - PIN_GAP);
+      }
+      flat.push(ev);
+      if (ev.sounds) head = ev;
+      prev = ev;
+      t += ln;
+    }
+  }
+  return { perfAt, perfTotal: perfAt[piece.totalEighths], flat };
+}
 
 function perfTotalOf(p) {
   const ferm = new Set(p.fermataEighths);
@@ -142,14 +180,15 @@ export function mountHurdyGurdy(container, opts = {}) {
   const params = new URLSearchParams(location.search);
   const compose = composePiece;
   let { piece, number } = openAddress(opts.piece || params.get('piece'), compose);
-  let pos = -2;                  // performance eighths; small lead-in
+  let pos = -BREATH;             // performance eighths; the blank before a piece
   let bpm = 0;                   // signed: negative = retrograde
   let bpmTarget = 0;
   let motorOn = false;
   let motorBpm = MOTOR_BPM;
   let lastUserInput = -1e9;
   let crankAngle = 2.4;            // at rest the arm hangs low, as cranks do
-  let choir = null, audioCtx = null;
+  let organ = null, audioCtx = null;
+  let windOn = false;
   let dragging = () => false;
   const sounding = new Map();    // eventKey -> handle
   let colors = null;
@@ -175,24 +214,11 @@ export function mountHurdyGurdy(container, opts = {}) {
   let perfAt = [];                 // source eighth -> performance eighth
   let perfTotal = 0;
   function reflatten() {
-    const ferm = fermSet();
-    perfAt = [0];
-    for (let k = 0; k < piece.totalEighths; k++)
-      perfAt.push(perfAt[k] + ((ferm.has(k) || ferm.has(k - 1)) ? 2 : 1));
-    perfTotal = perfAt[piece.totalEighths];
-    flat = [];
-    for (const vn of ['s', 'a', 't', 'b']) {
-      let t = 0;
-      for (const [m, ln] of piece.events[vn]) {
-        flat.push({ vn, m, start: perfAt[t], end: perfAt[t + ln],
-                    ferm: ferm.has(t), key: `${vn}:${t}` });
-        t += ln;
-      }
-    }
+    ({ perfAt, perfTotal, flat } = performanceOf(piece));
   }
 
-  function setPiece(p, n, startPos, elide = false) {
-    for (const h of sounding.values()) choir && choir.noteOff(h, elide ? 1.4 : 0.14);
+  function setPiece(p, n, startPos) {
+    for (const h of sounding.values()) organ && organ.noteOff(h);
     sounding.clear();
     piece = p; number = n; pos = startPos;
     reflatten();
@@ -209,14 +235,21 @@ export function mountHurdyGurdy(container, opts = {}) {
       history.replaceState(null, '', u);
     } catch { /* embedded contexts may forbid this */ }
   }
-  setPiece(piece, number, -2);
+  setPiece(piece, number, -BREATH);
 
   function ensureAudio() {
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      choir = new Choir(audioCtx);
+      organ = new Organ(audioCtx);
     }
     if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  // the crank works the bellows too: wind while it turns fast enough to sound
+  function setWind(on) {
+    if (!organ || on === windOn) return;
+    windOn = on;
+    organ.wind(on ? 1 : 0);
   }
 
   // ---- physics + transport ----
@@ -227,8 +260,9 @@ export function mountHurdyGurdy(container, opts = {}) {
     bpmTarget = Math.max(-MAX_BPM, Math.min(MAX_BPM, bpmTarget));
     bpm += (bpmTarget - bpm) * Math.min(1, dt * 6);   // smooths wheel-tick pulses
     const audible = Math.abs(bpm) >= MIN_AUDIBLE_BPM;
-    if (!audible && choir && sounding.size) {
-      for (const h of sounding.values()) choir.noteOff(h, 0.5);
+    setWind(audible);
+    if (!audible && organ && sounding.size) {
+      for (const h of sounding.values()) organ.noteOff(h, 0.5);
       sounding.clear();
     }
     if (audible) pos += (bpm / 60) * 2 * dt;
@@ -237,25 +271,27 @@ export function mountHurdyGurdy(container, opts = {}) {
     crankRot.style.transform = `rotate(${crankAngle}rad)`;
     crankRot.style.transformOrigin = '60px 60px';
 
-    // piece transitions (with a breath of silence either side); off either
-    // end of the shelf, the piece in hand plays again
-    if (pos >= perfTotal) {
+    // piece transitions: between pieces the barrel runs blank for a breath
+    // (2 x BREATH eighths, 1.8 s at the motor's 66 BPM), the last chord ending
+    // like any other while the church rings out and the bellows keep
+    // blowing. Off either end of the shelf, the piece in hand plays again.
+    if (pos >= perfTotal + BREATH) {
       const nx = pieceOrNext(number + 1, 1, compose) || { piece, number };
-      setPiece(nx.piece, nx.number, 0, true);     // last chord rings into the next piece
-    } else if (pos < 0 && bpm < -MIN_AUDIBLE_BPM) {
+      setPiece(nx.piece, nx.number, -BREATH);
+    } else if (pos < -BREATH && bpm < -MIN_AUDIBLE_BPM) {
       const pv = pieceOrNext(Math.max(1, number - 1), -1, compose) || { piece, number };
-      setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) - 0.01, true);
+      setPiece(pv.piece, pv.number, perfTotalOf(pv.piece) + BREATH - 0.01);
     }
 
     // declarative sounding set: works forward, backward, and through seeks
-    if (choir && audible) {
+    if (organ && audible) {
       for (const ev of flat) {
-        const should = ev.start <= pos && pos < ev.end;
+        const should = ev.sounds && ev.start <= pos && pos < ev.soundEnd;
         const has = sounding.has(ev.key);
         if (should && !has)
-          sounding.set(ev.key, choir.noteOn(ev.vn, ev.m, { swell: ev.ferm }));
+          sounding.set(ev.key, organ.noteOn(ev.vn, ev.m));
         else if (!should && has) {
-          choir.noteOff(sounding.get(ev.key));
+          organ.noteOff(sounding.get(ev.key));
           sounding.delete(ev.key);
         }
       }
@@ -453,7 +489,8 @@ export function mountHurdyGurdy(container, opts = {}) {
   const onVisibility = () => {
     if (document.hidden) {
       bpm = 0; bpmTarget = 0;
-      if (choir) { choir.releaseAll(0.2); sounding.clear(); }
+      if (organ) { organ.releaseAll(0.2); sounding.clear(); }
+      setWind(false);                            // no frames run while hidden
     }
   };
   document.addEventListener('visibilitychange', onVisibility);
@@ -472,13 +509,13 @@ export function mountHurdyGurdy(container, opts = {}) {
   }
   rafId = requestAnimationFrame(frame);
 
-  // teardown for SPA navigation: stop the loop, silence the choir, detach
+  // teardown for SPA navigation: stop the loop, silence the organ, detach
   return function unmount() {
     disposed = true;
     cancelAnimationFrame(rafId);
     document.removeEventListener('visibilitychange', onVisibility);
     themeObserver.disconnect();
-    if (choir) { choir.releaseAll(0.05); sounding.clear(); }
+    if (organ) { organ.releaseAll(0.05); sounding.clear(); }
     if (audioCtx) audioCtx.close();
     if (exportA.href.startsWith('blob:')) URL.revokeObjectURL(exportA.href);
     container.innerHTML = '';

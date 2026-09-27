@@ -29,7 +29,7 @@ engine/                           # fully automatic composition (no LLM in the l
                                   #   (compose-ahead buffer for instruments)
 
 instrument/web/                   # the Choral Hurdy-Gurdy: the engine ported to JS,
-│                                 #   a WebAudio choir, and a crankable music box —
+│                                 #   a WebAudio barrel organ, and a crankable music box —
 │                                 #   live at apophenia.blog/work/choral-hurdy-gurdy
 │                                 #   (CONCEPT.md alongside is the design record)
 
@@ -46,7 +46,7 @@ Three layers, one discipline:
 
 1. **The skill** (`.claude/skills/`) is where the musical knowledge is authored — the checkers, the oracle, the mined tables, and an **ornamentation layer** (`ornament.py` decorates a verified skeleton with passing tones, neighbors, suspensions, and cadential anticipations at rates mined from Bach's own figuration, rejecting any candidate that would break a rule; `check_ornaments.py` verifies the result).
 2. **The engine** (`engine/`) composes with no model in the loop — the oracle proposes bass moves (zero-support moves excluded), beam searches take the composer's veto role with line-shape scoring, the checkers are the final gate, then ornamentation. ~30 ms per piece; batch-validated 24/24 clean across six keys and both modes. `serve.py` exposes it over HTTP with a compose-ahead buffer.
-3. **The instrument** (`instrument/web/`) is the whole engine ported to dependency-free JavaScript plus a WebAudio choir, running as an infinite, crankable music box. 200/200 pieces verified clean in-browser at ~12 ms each; live at [apophenia.blog/work/choral-hurdy-gurdy](https://apophenia.blog/work/choral-hurdy-gurdy).
+3. **The instrument** (`instrument/web/`) is the whole engine ported to dependency-free JavaScript plus a WebAudio barrel organ, running as an infinite, crankable music box. 200/200 pieces verified clean in-browser at ~12 ms each; live at [apophenia.blog/work/choral-hurdy-gurdy](https://apophenia.blog/work/choral-hurdy-gurdy).
 
 ## The three safeguards
 

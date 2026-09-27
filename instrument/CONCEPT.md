@@ -193,8 +193,14 @@ Dash's play-testing taught us better:
 - **Tape x-axis is performance time.** Fermata chords draw twice as wide and
   the playhead moves linearly. (Drawn-width ≠ heard-length was the single
   most disorienting bug of play-testing.)
-- **Pieces crossfade** (~1.4 s release into the reverb while the next piece
-  attacks) instead of breathing in silence — radio, not hymnal.
+- **Pieces breathe** (2026-09): four eighths of blank barrel between them
+  (1.8 s at the motor's 66 BPM), the church ringing out while the bellows
+  keep blowing. They crossfaded before (a 1.4 s release into the reverb while
+  the next piece attacked: radio, not hymnal), but the organ's valves cut
+  that release to under half a second, so the next piece's first chord
+  landed on the last one. Dash chose the pause by ear from rendered seams;
+  the barrel audibly changing tunes in it was "really cute, but I think too
+  much".
 - **Tempo slider** (40–120) sets the motor; cranking overrides temporarily.
 - **Capture is crank-only.** The cabinet face scrolls the page; only the
   crank captures wheel/drag. (The concept's "pointer-over the machine"
@@ -239,3 +245,23 @@ Dash's play-testing taught us better:
   themselves, so they choose a Stollen that can be sung twice. The
   measurements behind each choice are in the engine review
   (`docs/engine-review/`).
+- **The organ** (2026-09). The choir (one oscillator a note, 8 fixed
+  partials, vibrato) sounded to Dash like a default synth: 94% of its energy
+  sat below 1 kHz and nothing marked a note's start. The machine is a barrel
+  organ in all but name (a crank turning a pinned program; English village
+  churches played hymns on them for two centuries), so it now sounds like
+  one: a Stopped Diapason 8' and a Flute 4', each pipe with its own partials
+  and speech (a puff of chiff), in Werckmeister III, in a generated stone
+  church. The registration was chosen by ear from rendered sketches: a first
+  voicing with a strong-odd-partial stopped rank and a sawtooth Principal 4'
+  was "square-wave, buzzy, almost a whine". `performanceOf` ties each
+  suspension (the engine writes the held eighth as its own event, so the
+  choir struck it again, about six times a piece) and lifts a repeated note
+  for a pin's width before it strikes again. Fermatas no longer swell: an
+  organ can't. Then it was given a place, again by ear from rendered rooms:
+  it is heard from far down the nave, in a wooden case that colours the
+  pipes, mechanism and all (the bellows rush while the crank turns, and each
+  key's valve knocks). From that far off, the room's tail muddied every chord
+  where it leaned on the low middle (the case added low-middle weight but no
+  ring; the tail was what rang), so the room keeps its low end lean. It plays
+  as loud as the choir did.
