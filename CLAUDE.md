@@ -15,7 +15,7 @@ layer that skipped ground-truth confrontation shipped with bugs.
   over the oracle → inner voices → checker gate → ornament) and HTTP server
   (`serve.py`: /compose, /harmonize, /next with compose-ahead buffer).
 - `instrument/web/` — the Choral Hurdy-Gurdy: full JS port of the engine +
-  WebAudio choir + the machine UI. **Vendored to the website** (see below).
+  WebAudio barrel organ + the machine UI. **Vendored to the website** (see below).
   `instrument/CONCEPT.md` is the design record, including as-shipped deltas.
 - `tools/` — corpus miners (`mine_oracle.py`, `mine_ornaments.py`,
   `mine_melody.py`), validation harnesses (`validate_checker.py` = the

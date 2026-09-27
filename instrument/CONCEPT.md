@@ -239,3 +239,17 @@ Dash's play-testing taught us better:
   themselves, so they choose a Stollen that can be sung twice. The
   measurements behind each choice are in the engine review
   (`docs/engine-review/`).
+- **The organ** (2026-09). The choir (one oscillator a note, 8 fixed
+  partials, vibrato) sounded to Dash like a default synth: 94% of its energy
+  sat below 1 kHz and nothing marked a note's start. The machine is a barrel
+  organ in all but name (a crank turning a pinned program; English village
+  churches played hymns on them for two centuries), so it now sounds like
+  one: a Stopped Diapason 8' and a Flute 4', each pipe with its own partials
+  and speech (a puff of chiff), in Werckmeister III, in a generated stone
+  church. The registration was chosen by ear from rendered sketches: a first
+  voicing with a strong-odd-partial stopped rank and a sawtooth Principal 4'
+  was "square-wave, buzzy, almost a whine". `performanceOf` ties each
+  suspension (the engine writes the held eighth as its own event, so the
+  choir struck it again, about six times a piece) and lifts a repeated note
+  for a pin's width before it strikes again. Fermatas no longer swell: an
+  organ can't.

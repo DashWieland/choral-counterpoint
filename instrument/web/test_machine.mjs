@@ -3,7 +3,7 @@
 // last piece, and every search past null chorales returns. (Before the
 // bound, the stuck-float addresses below froze the tab.)
 import { composePiece } from './engine.js';
-import { openAddress, pieceOrNext } from './machine.js';
+import { openAddress, pieceOrNext, performanceOf } from './machine.js';
 
 const LAST = Number.MAX_SAFE_INTEGER;
 let checks = 0, failed = 0;
@@ -37,5 +37,32 @@ expect('before No. 1', pieceOrNext(0, -1), null);
 // the machine plays engine.js
 expect('No. 42 is engine.js No. 42', openAddress('42').piece.key, composePiece(42).key);
 
-console.log(failed ? `\n${failed}/${checks} FAILED` : `address contract holds (${checks} checks)`);
+// the performance layout: suspensions tied, a pin's gap before a repeated note
+{
+  let tiedWrong = 0, overlaps = 0, silences = 0, tied9 = 0;
+  for (let n = 1; n <= 200; n++) {
+    const { flat } = performanceOf(composePiece(n));
+    for (const vn of ['s', 'a', 't', 'b']) {
+      const evs = flat.filter(e => e.vn === vn);
+      let soundEnd = 0;
+      for (let i = 0; i < evs.length; i++) {
+        const e = evs[i];
+        if (!e.sounds) {                                   // a held eighth continues its pitch
+          if (i === 0 || evs[i - 1].m !== e.m) tiedWrong++;
+          if (n === 9) tied9++;
+          continue;
+        }
+        if (e.start < soundEnd - 1e-9) overlaps++;        // one note at a time in a voice
+        if (e.start - soundEnd > 0.08 + 1e-9) silences++;  // nothing silent but pin gaps
+        soundEnd = e.soundEnd;
+      }
+    }
+  }
+  expect('held eighths continue the same pitch (Nos. 1-200)', tiedWrong, 0);
+  expect('a voice never sounds two notes at once (Nos. 1-200)', overlaps, 0);
+  expect('inside a voice the only silences are pin gaps (Nos. 1-200)', silences, 0);
+  expect('No. 9 ties its 7 suspensions', tied9, 7);
+}
+
+console.log(failed ? `\n${failed}/${checks} FAILED` : `address contract and performance layout hold (${checks} checks)`);
 process.exitCode = failed ? 1 : 0;
