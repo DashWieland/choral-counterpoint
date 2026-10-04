@@ -792,7 +792,9 @@ function bassLine(sop, fermatas, tonicPc, mode, rng, beamWidth = 10, temp = 0, r
   const rel = m => mod12(m - tonicPc);
   const pairs = PAIRS[mode];
   const scale = SCALES[mode];
-  const opens = ORACLE.openings[`${mode}|${rel(sop[0])}`] || { '0': 1 };
+  // the piece opens with the tonic in the bass, as Bach's chorales do (the
+  // oracle's openings are every phrase's, and would open on la or mi)
+  const opens = { '0': 1 };
   // what the inner-voice search and the checker would reject anyway, refused
   // where the notes are written: bass note cand at chord i after prev
   const legal = (i, prev, cand, tPc) => {
@@ -919,6 +921,7 @@ function harmonize(sop, bass, fermatas, tonicPc, mode, beamWidth = 14, rep = 0) 
   for (let i = 0; i < n; i++) {
     const opts = [];
     for (let ci = 0; ci < vocab.length; ci++) {
+      if (i === 0 && ci !== 0) continue;          // the first chord is I or i, complete
       const ch = vocab[ci];
       const pcs = new Set(ch.pcs.map(abspc));
       if (!pcs.has(mod12(sop[i])) || !pcs.has(mod12(bass[i]))) continue;
@@ -931,7 +934,7 @@ function harmonize(sop, bass, fermatas, tonicPc, mode, beamWidth = 14, rep = 0) 
         if (arrives && (fermSet.has(i + 2) || i + 1 === n - 1)) cost -= 0.8;
       }
       for (const [a, t, missing] of voicings(ch, sop[i], bass[i], tonicPc))
-        opts.push([a, t, ci, missing + cost]);
+        if (i > 0 || !missing) opts.push([a, t, ci, missing + cost]);
     }
     if (!opts.length) return null;
     slots.push(opts);

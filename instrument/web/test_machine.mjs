@@ -61,7 +61,7 @@ expect('No. 42 is engine.js No. 42', openAddress('42').piece.key, composePiece(4
   expect('held eighths continue the same pitch (Nos. 1-200)', tiedWrong, 0);
   expect('a voice never sounds two notes at once (Nos. 1-200)', overlaps, 0);
   expect('inside a voice the only silences are pin gaps (Nos. 1-200)', silences, 0);
-  expect('No. 9 ties its 7 suspensions', tied9, 7);
+  expect('No. 9 ties its 8 suspensions', tied9, 8);
 }
 
 console.log(failed ? `\n${failed}/${checks} FAILED` : `address contract and performance layout hold (${checks} checks)`);
