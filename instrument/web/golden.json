@@ -1,119 +1,119 @@
 {
  "engine": "instrument/web/engine.js",
- "note": "composePiece(n) of engine.js: the pieces the machine plays (Edition 2, bar form, the only edition since 2026-09-26). Re-record only when the engine changes on purpose, in the same commit: node golden.mjs --write --replace. A mismatch otherwise means ?piece=N links now play different music.",
+ "note": "composePiece(n) of engine.js: the pieces the machine plays. Re-record only when the engine changes on purpose, in the same commit: node golden.mjs --write --replace. A mismatch otherwise means ?piece=N links now play different music.",
  "pieces": {
-  "1": "eefdd066720e2058",
-  "2": "9aaaefeac6ff2616",
-  "3": "40118127b58ea4b0",
-  "4": "816a8c930534e248",
-  "5": "6fb127d7ac334031",
-  "6": "c4175dd73fb931a6",
-  "7": "8e1d57d93b5390a1",
-  "8": "b813c5492800f075",
-  "9": "15786a159ff4c68e",
-  "10": "1b939faa948fe44d"
+  "1": "8cba52107780ef18",
+  "2": "4c487c94d7fe7430",
+  "3": "c01b753451d865ca",
+  "4": "bb698f49eea06d90",
+  "5": "90b551552a194e8a",
+  "6": "8c18c24793b75005",
+  "7": "9ba444bc099e3ce6",
+  "8": "bc724d1611417af7",
+  "9": "79241f38c06d9e90",
+  "10": "eb21b986cb52f10c"
  },
- "first200": "1f4b47a2cbd7da49",
+ "first200": "b964dc33442a5fc7",
  "blocks": [
   {
    "from": 1,
    "to": 1000,
-   "digest": "cd2bdb039e0b785c"
+   "digest": "ee4c745ca820d7cd"
   },
   {
    "from": 1001,
    "to": 2000,
-   "digest": "b2e51302ee6b4f1f"
+   "digest": "5441f5c37cdacf4a"
   },
   {
    "from": 2001,
    "to": 3000,
-   "digest": "b05cd28bf93b0df0"
+   "digest": "6fafea838567b470"
   },
   {
    "from": 3001,
    "to": 4000,
-   "digest": "b3e7bb91cbdee6ca"
+   "digest": "37c9ac8204a2fc5e"
   },
   {
    "from": 4001,
    "to": 5000,
-   "digest": "0df62844f7f57910"
+   "digest": "159d42bdc0caceec"
   },
   {
    "from": 5001,
    "to": 6000,
-   "digest": "b54e5b1c1129fa64"
+   "digest": "b41d420c2d0e0d58"
   },
   {
    "from": 6001,
    "to": 7000,
-   "digest": "d9b6f3e8ed8d5792"
+   "digest": "03574d921d2eae3b"
   },
   {
    "from": 7001,
    "to": 8000,
-   "digest": "089ac256325d1662"
+   "digest": "7f3932315043000c"
   },
   {
    "from": 8001,
    "to": 9000,
-   "digest": "6dd66e5a83e9bbcd"
+   "digest": "25e0fca6009a5538"
   },
   {
    "from": 9001,
    "to": 10000,
-   "digest": "896057515061e9a1"
+   "digest": "0dc098bf2fae7fc6"
   },
   {
    "from": 10001,
    "to": 11000,
-   "digest": "45b368f04ad7b605"
+   "digest": "c52c0fd8fcdfa6c3"
   },
   {
    "from": 11001,
    "to": 12000,
-   "digest": "f8386c79c5539c6e"
+   "digest": "fc1f7f5cdc56fc2d"
   },
   {
    "from": 12001,
    "to": 13000,
-   "digest": "a5f11c6d36bddd1e"
+   "digest": "48b1d4860327c26d"
   },
   {
    "from": 13001,
    "to": 14000,
-   "digest": "fb713141f2140e7f"
+   "digest": "c3bb3a6f163449b8"
   },
   {
    "from": 14001,
    "to": 15000,
-   "digest": "c8a9086996a4c796"
+   "digest": "6131dc9ce7622c22"
   },
   {
    "from": 15001,
    "to": 16000,
-   "digest": "3945740c31f701e0"
+   "digest": "80358d2553c0e074"
   },
   {
    "from": 16001,
    "to": 17000,
-   "digest": "aabd5f2c1ade4633"
+   "digest": "a45e7545b21e2a39"
   },
   {
    "from": 17001,
    "to": 18000,
-   "digest": "251507bb0895faff"
+   "digest": "f6be8c56e11c636e"
   },
   {
    "from": 18001,
    "to": 19000,
-   "digest": "f5d9b2476aab1668"
+   "digest": "524c4a23c7c117e8"
   },
   {
    "from": 19001,
    "to": 20000,
-   "digest": "edd933f5172062c5"
+   "digest": "8d5158a90e623b01"
   }
  ]
 }

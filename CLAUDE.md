@@ -54,15 +54,17 @@ layer that skipped ground-truth confrontation shipped with bugs.
 
 - JS engine batch: `cd instrument/web && node test_engine.mjs`
   (engine.js: 200/200 clean and in bar form, the Stollen repeated note for
-  note with its ornaments; ends on the tonic, soprano in range, first draft
+  note with its ornaments; opens on a complete I/i over the tonic, ends on
+  the tonic, soprano in range, first draft
   kept ≥90%, ~21 ms/piece; pieces 1–200 match golden.json)
 - Census of an engine: `cd instrument/web && node census.mjs 1 20000`, or
   `node census.mjs sample 2000` for addresses spread up to 2^53 (Edition 2
-  with bar form: first draft kept 96.9% and 97.4%, nothing empty, off the
-  tonic, or out of range)
+  with bar form and tonic openings: first draft kept 96.7% and 97.3%,
+  nothing empty, off the tonic, or out of range)
 - Python engine census: `python engine/census.py` (2,520 pieces, every
-  tonic, mode and size: first draft kept 96.9%, every piece in bar form
-  with a literal repeat, on the tonic and in range; about 3 minutes)
+  tonic, mode and size: first draft kept 96.8%, every piece in bar form
+  with a literal repeat, opening on I, ending on the tonic, in range;
+  about 3 minutes)
 - Golden test: `cd instrument/web && node golden.mjs`
   (engine.js's pieces 1–20,000 unchanged; about seven minutes)
 - Machine address contract: `cd instrument/web && node test_machine.mjs`

@@ -6,9 +6,10 @@ counts 2 to 4, seeds 1..60 (2,520 pieces).
 
     python engine/census.py [seeds=60]
 
-Each piece must end on the tonic in soprano and bass, keep the soprano in
-range, and be in bar form: the Stollen sung twice note for note, ornaments
-included, phrases of 6 to 8 chords, and one climax. compose() already
+Each piece must open on a complete I or i with the tonic in the bass, end
+on the tonic in soprano and bass, keep the soprano in range, and be in bar
+form: the Stollen sung twice note for note, ornaments included, phrases of
+6 to 8 chords, and one climax. compose() already
 guarantees no checker violations.
 """
 import collections, sys, time
@@ -48,6 +49,9 @@ def main(seeds=60):
                     t['chords'] += len(sop)
                     if (sop[-1] - tpc) % 12 or (bass[-1] - tpc) % 12:
                         broken['off the tonic'] += 1
+                    triad = {0, 3 if mode == 'minor' else 4, 7}
+                    if (bass[0] - tpc) % 12 or {(sk[v][0] - tpc) % 12 for v in VOICES} != triad:
+                        broken['not opening on a complete tonic chord'] += 1
                     if any(m < 60 or m > 81 for m in sop):
                         broken['soprano out of range'] += 1
                     ends = p['skeleton']['fermatas']
@@ -69,7 +73,7 @@ def main(seeds=60):
           f"{t['drafts'] / kept:.2f} drafts per piece, {t['none']} none, "
           f"{t['chords'] / kept:.1f} chords per piece, {t['warnings'] / kept:.2f} warnings per piece, "
           f"{(time.time() - t0) / t['n']:.2f} s per piece")
-    print('every piece in bar form, literal repeat, on the tonic and in range' if not broken
+    print('every piece in bar form, literal repeat, opens on I, ends on the tonic, in range' if not broken
           else 'BROKEN: ' + ', '.join(f'{k} {v}' for k, v in broken.items()))
     return 1 if broken or t['none'] else 0
 

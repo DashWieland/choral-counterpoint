@@ -615,6 +615,11 @@ def concretize(pc, prev_pitch, lo=38, hi=62):
     cands = [m for m in range(lo, hi + 1) if m % 12 == pc and abs(m - prev_pitch) <= 12]
     return sorted(cands, key=lambda m: (abs(m - prev_pitch), abs(m - 48)))
 
+def opens_on_tonic(sop, tonic_pc, mode):
+    """Can the first chord be I or i? Always, for the engine's own melodies
+    (they start on 1, 3 or 5); a given melody may start elsewhere."""
+    return (sop[0] - tonic_pc) % 12 in {0, 3 if mode == 'minor' else 4, 7}
+
 def bass_line(sop, fermatas, tonic_pc, mode, rng, beam_width=10, temp=0.0, rep=0):
     """rep: chords in the Stollen, sung again right after it. Inside the
     repeat each line may only repeat what it wrote the first time, so the
@@ -624,7 +629,11 @@ def bass_line(sop, fermatas, tonic_pc, mode, rng, beam_width=10, temp=0.0, rep=0
     rel = lambda m: (m - tonic_pc) % 12
     pairs = chordlib.harmonizable_pairs(mode)
     scale = chordlib.scale(mode)
-    opens = ORACLE['openings'].get(f"{mode}|{rel(sop[0])}", {'0': 1})
+    # the piece opens with the tonic in the bass, as Bach's chorales do (the
+    # oracle's openings are every phrase's, and would open on la or mi); a
+    # given melody that starts off the tonic triad keeps the oracle's choice
+    opens = {'0': 1} if opens_on_tonic(sop, tonic_pc, mode) else \
+        ORACLE['openings'].get(f"{mode}|{rel(sop[0])}", {'0': 1})
 
     def legal(i, prev, cand, t_pc):
         """What the inner-voice search and the checker would reject later,
@@ -763,6 +772,7 @@ def harmonize(sop, bass, fermatas, tonic_pc, mode, beam_width=14, rep=0):
     scale = chordlib.scale(mode)
     abspc = lambda rel: (rel + tonic_pc) % 12
     ferm_set = set(fermatas)
+    open_tonic = opens_on_tonic(sop, tonic_pc, mode)
 
     def legal(i, pa, pt, a, t):
         """Hard rejects, stricter than the checker (even across fermatas): no
@@ -789,6 +799,8 @@ def harmonize(sop, bass, fermatas, tonic_pc, mode, beam_width=14, rep=0):
     for i in range(n):
         opts = []
         for ci, ch in enumerate(vocab):
+            if i == 0 and ci != 0 and open_tonic:
+                continue                               # the first chord is I or i, complete
             pcs = {abspc(p) for p in ch['pcs']}
             if sop[i] % 12 not in pcs or bass[i] % 12 not in pcs:
                 continue
@@ -807,7 +819,8 @@ def harmonize(sop, bass, fermatas, tonic_pc, mode, beam_width=14, rep=0):
                 if arrives and (i + 2 in ferm_set or i + 1 == n - 1):
                     cost -= 0.8                        # V/x into a cadence: Bach's move
             for a, t, missing in voicings(ch, sop[i], bass[i], tonic_pc):
-                opts.append((a, t, ci, missing + cost))
+                if i > 0 or not missing or not open_tonic:
+                    opts.append((a, t, ci, missing + cost))
         if not opts:
             return None
         slots.append(opts)

@@ -27,6 +27,10 @@ for (let n = 1; n <= 200; n++) {
   const broken = [];
   if (['s', 'a', 't', 'b'].some(v => sk[v].some(m => !Number.isInteger(m)))) broken.push('a note is not a pitch');
   if (mod12(sk.s[last] - p.tonicPc) || mod12(sk.b[last] - p.tonicPc)) broken.push('does not end on the tonic');
+  const tonicTriad = [0, p.mode === 'minor' ? 3 : 4, 7];
+  const first = new Set(['s', 'a', 't', 'b'].map(v => mod12(sk[v][0] - p.tonicPc)));
+  if (mod12(sk.b[0] - p.tonicPc) || first.size !== 3 || tonicTriad.some(d => !first.has(d)))
+    broken.push('does not open on a complete tonic chord');
   if (sk.s.some(m => m < 60 || m > 81)) broken.push('soprano out of range');
   // bar form
   const L = p.form.stollenChords;
